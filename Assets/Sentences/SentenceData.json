@@ -1,0 +1,53 @@
+{
+    "chapters": [
+        {
+            "ChapterName": "ch",
+            "NextChapter": -1,
+            "sentences": [
+                {
+                    "Name": "name",
+                    "Text": "sentence",
+                    "artworkType": "0",
+                    "BG_ID": 0,
+                    "CG_ID": 0,
+                    "Choice": false,
+                    "choiceOptions": [
+                        {
+                            "OptionID": 0,
+                            "OptionText": ""
+                        }
+                    ],
+                    "Viewed": false,
+                    "Voiced": false,
+                    "VoiceClip": ""
+                }
+            ]
+        }
+    ],
+    "characterData": [
+        {
+            "characterName": "name",
+            "useSeperateColors": false,
+            "colorRGB": [
+            ],
+            "colorHex": "",
+            "nameColorRGB": [
+            ],
+            "nameColorHex": "",
+            "textColorRGB": [
+            ],
+            "textColorHex": "",
+            "gradientType": 0,
+            "useSeperateGradientColors": false,
+            "nameColorGradientRGB": [
+            ],
+            "nameColorGradientHex": "",
+            "textColorGradientRGB": [
+            ],
+            "textColorGradientHex": "",
+            "colorGradientRGB": [
+            ],
+            "colorGradientHex": ""
+        }
+    ]
+}
