@@ -9,183 +9,185 @@ using System.Diagnostics;
 
 public class SaveLoadSystem : MonoBehaviour
 {
-    #region Fields
-        public DialogueManager dialogueManager;
+	#region Fields
+		public DialogueManager dialogueManager;
 
-        public int sentenceID;
-        public int chapterID;
+		public int sentenceID;
+		public int chapterID;
 
-        public Button loadButton;
+		public Button loadButton;
 
-        public Texture2D image;
+		public Texture2D image;
 
-        private SaveData quickSaveData;
+		private SaveData quickSaveData;
 
-        private SaveData[] SavedataList;
+		private SaveData[] SavedataList;
 
-        public Camera mainCamera;
-    #endregion
+		public Camera mainCamera;
+	#endregion
 
-    void Start()
-    {
-        if (File.Exists(Application.persistentDataPath + "/QuickSave.sav")) { loadButton.interactable = true; }
-        else { loadButton.interactable = false; }
-        quickSaveData = new SaveData();
-        SavedataList = new SaveData[0];
-        for (int i = 0; i < SavedataList.Length; i++)
-        {
-            Load(i);
-        }
-    }
+	void Start()
+	{
+		if (File.Exists(Application.persistentDataPath + "/QuickSave.sav")) { loadButton.interactable = true; }
+		else { loadButton.interactable = false; }
+		quickSaveData = new SaveData();
+		SavedataList = new SaveData[0];
+		for (int i = 0; i < SavedataList.Length; i++)
+		{
+			Load(i);
+		}
+	}
 
-    void Update()
-    {
+	void Update()
+	{
 
-    }
+	}
 
-    public void AddChoiceData(List<BacklogEntry> backlog)
-    {
-        quickSaveData.Choices = backlog;
+	public void AddChoiceData(List<BacklogEntry> backlog)
+	{
+		quickSaveData.Choices = backlog;
 
-        UnityEngine.Debug.Log("Choice ID: " + quickSaveData.Choices[0]);
-    }
+		UnityEngine.Debug.Log("Choice ID: " + quickSaveData.Choices[0]);
+	}
 
-    public void QuickSaveStart()
-    {
-        StartCoroutine(readPixels());
-    }
+	public void QuickSaveStart()
+	{
+		StartCoroutine(readPixels());
+	}
 
-    public void QuickSave()
-    {
-        quickSaveData.SentenceID = dialogueManager.BacklogID - 1;
-        quickSaveData.ChapterID = dialogueManager.scripts.ChapterManagerScript.CurrentChapterIndex;
+	public void QuickSave()
+	{
+		quickSaveData.SentenceID = dialogueManager.BacklogID - 1;
+		quickSaveData.ChapterID = dialogueManager.scripts.ChapterManagerScript.CurrentChapterIndex;
 
-        AddChoiceData(dialogueManager.Returnbacklog());
+		AddChoiceData(dialogueManager.Returnbacklog());
 
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/QuickSave.sav");
+		BinaryFormatter bf = new BinaryFormatter();
+		FileStream file = File.Create(Application.persistentDataPath + "/QuickSave.sav");
 
-        bf.Serialize(file, quickSaveData);
+		bf.Serialize(file, quickSaveData);
 
-        file.Close();
+		file.Close();
 
-        loadButton.interactable = true;
-        UnityEngine.Debug.Log("Save succesful!");
-    }
+		loadButton.interactable = true;
+		UnityEngine.Debug.Log("Save succesful!");
+	}
 
-    public void QuickLoad()
-    {
-        if (File.Exists(Application.persistentDataPath + "/QuickSave.sav"))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/QuickSave.sav", FileMode.Open);
+	public void QuickLoad()
+	{
+		if (File.Exists(Application.persistentDataPath + "/QuickSave.sav"))
+		{
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream file = File.Open(Application.persistentDataPath + "/QuickSave.sav", FileMode.Open);
 
-            SaveData save = (SaveData)bf.Deserialize(file);
+			SaveData save = (SaveData)bf.Deserialize(file);
 
-            file.Close();
+			file.Close();
 
-            sentenceID = save.SentenceID;
-            chapterID = save.ChapterID;
+			sentenceID = save.SentenceID;
+			chapterID = save.ChapterID;
 
-            quickSaveData = save;
+			quickSaveData = save;
 
-            image = new Texture2D(Screen.width, Screen.height);
-            image.LoadImage(save.ImageSave);
-        }
-    }
+			image = new Texture2D(Screen.width, Screen.height);
+			image.LoadImage(save.ImageSave);
+		}
+	}
 
-    public void Save()
-    {
-        int slot = 0;
-        if (slot + 1 >= SavedataList.Length)
-        {
-            Array.Resize(ref SavedataList, slot + 1);
-            SavedataList[slot] = new SaveData();
-        }
-        quickSaveData.SentenceID = dialogueManager.BacklogID - 1;
-        quickSaveData.ChapterID = dialogueManager.scripts.ChapterManagerScript.CurrentChapterIndex;
+	public void Save()
+	{
+		int slot = 0;
+		if (slot + 1 >= SavedataList.Length)
+		{
+			Array.Resize(ref SavedataList, slot + 1);
+			SavedataList[slot] = new SaveData();
+		}
+		quickSaveData.SentenceID = dialogueManager.BacklogID - 1;
+		quickSaveData.ChapterID = dialogueManager.scripts.ChapterManagerScript.CurrentChapterIndex;
 
-        AddChoiceData(dialogueManager.Returnbacklog());
+		AddChoiceData(dialogueManager.Returnbacklog());
 
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/Save_" + slot + ".sav");
+		BinaryFormatter bf = new BinaryFormatter();
+		FileStream file = File.Create(Application.persistentDataPath + "/Save_" + slot + ".sav");
 
-        bf.Serialize(file, SavedataList[slot]);
+		bf.Serialize(file, SavedataList[slot]);
 
-        file.Close();
+		file.Close();
 
-        loadButton.interactable = true;
-        UnityEngine.Debug.Log("Save succesful!");
-    }
+		loadButton.interactable = true;
+		UnityEngine.Debug.Log("Save succesful!");
+	}
 
-    public void Load(int slot)
-    {
-        if (File.Exists(Application.persistentDataPath + "/Save_" + slot + ".sav"))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/Save_" + slot + ".sav", FileMode.Open);
+	public void Load(int slot)
+	{
+		if (File.Exists(Application.persistentDataPath + "/Save_" + slot + ".sav"))
+		{
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream file = File.Open(Application.persistentDataPath + "/Save_" + slot + ".sav", FileMode.Open);
 
-            SaveData save = (SaveData)bf.Deserialize(file);
+			SaveData save = (SaveData)bf.Deserialize(file);
 
-            file.Close();
+			file.Close();
 
-            sentenceID = save.SentenceID;
-            chapterID = save.ChapterID;
+			sentenceID = save.SentenceID;
+			chapterID = save.ChapterID;
 
-            SavedataList[slot] = save;
+			SavedataList[slot] = save;
 
-            image = new Texture2D(Screen.width, Screen.height);
-            image.LoadImage(save.ImageSave);
-        }
-    }
+			image = new Texture2D(Screen.width, Screen.height);
+			image.LoadImage(save.ImageSave);
+		}
+	}
 
-    public void LoadSave()
-    {
-        int slot = 0;
-        dialogueManager.QuickLoadChapter(SavedataList[slot]);
-    }
+	public void LoadSave()
+	{
+		int slot = 0;
+		dialogueManager.QuickLoadChapter(SavedataList[slot]);
+	}
 
-    public void QuickLoadSave() {
-        dialogueManager.QuickLoadChapter(quickSaveData);
-    }
+	public void QuickLoadSave() {
+		dialogueManager.QuickLoadChapter(quickSaveData);
+	}
 
-    WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
-    public IEnumerator readPixels()
-    {
-        dialogueManager.HideUI();
-        yield return frameEnd;
+	WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
+	public IEnumerator readPixels()
+	{
+		bool temp = dialogueManager.gameObjects.UI.activeInHierarchy;
+		dialogueManager.HideUI();
+		yield return frameEnd;
 
-        RenderTexture imageIN = new RenderTexture(Screen.width, Screen.height, 24);
-        imageIN.Create();
+		RenderTexture imageIN = new RenderTexture(Screen.width, Screen.height, 24);
+		imageIN.Create();
 
-        mainCamera.targetTexture = imageIN;
+		mainCamera.targetTexture = imageIN;
 
-        image = new Texture2D(Screen.width, Screen.height);
-        image.ReadPixels(new Rect(0, 0, imageIN.width, imageIN.height), 0, 0);
-        image.Apply();
+		image = new Texture2D(Screen.width, Screen.height);
+		image.ReadPixels(new Rect(0, 0, imageIN.width, imageIN.height), 0, 0);
+		image.Apply();
 
-        quickSaveData.ImageSave = image.EncodeToPNG();
+		quickSaveData.ImageSave = image.EncodeToPNG();
 
-        mainCamera.targetTexture = null;
+		mainCamera.targetTexture = null;
 
-        dialogueManager.ShowUI();
+		if(temp)
+			dialogueManager.ShowUI();
 
-        QuickSave();
-    }
+		QuickSave();
+	}
 }
 
 [System.Serializable]
 public class SaveData
 {
-    public int SentenceID;
-    public int ChapterID;
-    public byte[] ImageSave;
-    public List<BacklogEntry> Choices = new List<BacklogEntry>();
+	public int SentenceID;
+	public int ChapterID;
+	public byte[] ImageSave;
+	public List<BacklogEntry> Choices = new List<BacklogEntry>();
 }
 
 [System.Serializable]
 public class BacklogEntry
 {
-    public int sentenceID;
-    public int chapterID;
+	public int sentenceID;
+	public int chapterID;
 }
