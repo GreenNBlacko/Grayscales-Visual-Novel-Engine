@@ -10,7 +10,7 @@ My visual novel engine aims for simplicity for the user while having complete co
 - Active support for fixing issues that you might encounter in your visual novel creation journey
 
 # Installation
-- Downlaod and install your preferred unity version(suggested version: 2020.1.2f1).
+- Download and install your preferred unity version(suggested version: 2020.1.2f1).
 - Download the latest release from the releases page.
 - Extract the .zip file in an empty folder, preferably named after your project(e.g: Falling leaves of October).
 
