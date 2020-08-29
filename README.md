@@ -25,6 +25,6 @@ My visual novel engine aims for simplicity for the user while having complete co
 - Assign all the variables for the **'DialogueManager'** script.
 - Edit the choice and backlog prefabs to match your preference.
 
-That's it! You're ready to create your own viaual novel! Good luck in your journey and if you have any problems figuring out the engine--
+That's it! You're ready to create your own visual novel! Good luck in your journey and if you have any problems figuring out the engine--
 
 Head to the docs page for an explanation on how to use one or another feature
