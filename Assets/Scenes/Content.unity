@@ -594,9 +594,9 @@ RectTransform:
   m_Father: {fileID: 1997703802}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 805, y: -26.800003}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -108, y: -26.800003}
   m_SizeDelta: {x: 60, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &92959536
@@ -643,8 +643,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 228308020}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: QuickLoad
+        m_TargetAssemblyTypeName: SaveLoadSystem, Assembly-CSharp
+        m_MethodName: QuickLoadSave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1251,6 +1251,7 @@ GameObject:
   - component: {fileID: 228308019}
   - component: {fileID: 228308020}
   - component: {fileID: 228308021}
+  - component: {fileID: 228308022}
   m_Layer: 0
   m_Name: ScriptManager
   m_TagString: Untagged
@@ -1291,6 +1292,7 @@ MonoBehaviour:
     sentenceManager: {fileID: 1608444528}
     CharacterInfoScript: {fileID: 228308018}
     ChapterManagerScript: {fileID: 228308019}
+    characterManagerScript: {fileID: 0}
   textBox:
     NameText: {fileID: 1448399164}
     SentenceText: {fileID: 1022421486}
@@ -1358,20 +1360,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultCharacterPic: {fileID: 0}
   Characters:
-  - CharacterName: Test Character 1
+  - CharacterName: Yayoi
     CharacterStates:
-    - StateName: a
+    - StateName: Regular_1
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
-    - StateName: C
+      StateImage: {fileID: 21300000, guid: 14e1ed894da01534d987ad589082ae51, type: 3}
+    - StateName: Shocked_1
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
-    - StateName: BC
+      StateImage: {fileID: 21300000, guid: f222624e39ed6ea4eb994bce20b8e1c6, type: 3}
+    - StateName: Scared_2
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
+      StateImage: {fileID: 21300000, guid: 5e7ece285dba3be419f893d01eddf17e, type: 3}
     CharacterPic: {fileID: 0}
     UseSeperateColors: 0
     Color:
@@ -1542,6 +1544,22 @@ MonoBehaviour:
   sentenceData:
     chapters: []
     characterData: []
+--- !u!114 &228308022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228308014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 827b7c2eb7e29344d998f7ec8a9d16f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CharacterArray: {fileID: 1000341074}
+  CharacterPrefabs:
+  - {fileID: 4530323568431650453, guid: f5bd8ed0f1860324f9920af87a6fa59c, type: 3}
+  resolution: {x: 2650, y: 1440}
 --- !u!1 &321776636
 GameObject:
   m_ObjectHideFlags: 0
@@ -3918,9 +3936,9 @@ RectTransform:
   m_Father: {fileID: 1997703802}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 873.56, y: -26.800003}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -39.43994, y: -26.800003}
   m_SizeDelta: {x: 60, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &747468008
@@ -4951,10 +4969,10 @@ RectTransform:
   m_Father: {fileID: 2103564163}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 452}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1001380793
 GameObject:
@@ -5164,9 +5182,9 @@ RectTransform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 14}
-  m_SizeDelta: {x: -28, y: 124.7}
+  m_SizeDelta: {x: -28, y: -98}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1022421486
 MonoBehaviour:
@@ -5216,8 +5234,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.25
-  m_fontSizeBase: 24.25
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -8053,7 +8071,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 7, y: -7}
-  m_SizeDelta: {x: 345.9, y: 30.5}
+  m_SizeDelta: {x: 345.9, y: 51.5}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1448399164
 MonoBehaviour:
@@ -8103,8 +8121,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.25
-  m_fontSizeBase: 24.25
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -9084,23 +9102,31 @@ MonoBehaviour:
   - ChapterName: Chapter 1
     NextChapter: 1
     Sentences:
-    - Name: Test Character 1
-      Text: Testing UI features
+    - Name: Yayoi
+      Text: Testing character manager
       transition: 0
       artworkType: 1
-      BG_ID: 0
+      BG_ID: 2
       CG_ID: 0
       Choice: 0
       choiceOptions: []
       Viewed: 0
       Voiced: 0
-      onSentenceInit: []
       VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 0
+        CharacterName: Yayoi
+        CharacterState: Regular_1
+        EnterScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 0, y: 0}
   - ChapterName: Chapter 2
     NextChapter: 0
     Sentences:
-    - Name: Test Character 3
-      Text: Backlog test
+    - Name: Yayoi
+      Text: Testing character manager
       transition: 0
       artworkType: 1
       BG_ID: 0
@@ -9109,24 +9135,16 @@ MonoBehaviour:
       choiceOptions: []
       Viewed: 0
       Voiced: 0
-      onSentenceInit:
-      - actionType: 3
-        CharacterName: Test Character 1
-        CharacterState: a
-        Position: {x: 0, y: 0}
-      - actionType: 3
-        CharacterName: Test Character 2
-        CharacterState: C
-        Position: {x: 0, y: 0}
-      - actionType: 0
-        CharacterName: Test Character 1
-        CharacterState: Test 1
-        Position: {x: 0, y: 0}
-      - actionType: 1
-        CharacterName: Test Character 3
-        CharacterState: 3
-        Position: {x: 0, y: 0}
       VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 1
+        CharacterName: Yayoi
+        CharacterState: Regular_1
+        EnterScene: 0
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 500, y: 0}
 --- !u!4 &1608444529
 Transform:
   m_ObjectHideFlags: 0
@@ -10627,9 +10645,9 @@ RectTransform:
   m_Father: {fileID: 1997703802}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 736.4, y: -26.800003}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -176.60004, y: -26.800003}
   m_SizeDelta: {x: 60, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1875758184
@@ -11212,7 +11230,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 194.40002}
+  m_SizeDelta: {x: 0, y: 317.1}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1997703804
 MonoBehaviour:
@@ -12021,10 +12039,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScaleFactor: 2
+  m_ReferenceResolution: {x: 1600, y: 1296}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -12041,7 +12059,7 @@ Canvas:
   m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0

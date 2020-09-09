@@ -6,9 +6,11 @@ public class DrawIfAnyAttribute : PropertyAttribute {
 
 	public string comparedPropertyName { get; private set; }
 	public object[] comparedValueArray { get; private set; }
+	public bool slider { get; private set; }
 
-	public DrawIfAnyAttribute(string comparedPropertyName, object[] comparedValueArray) {
+	public DrawIfAnyAttribute(string comparedPropertyName, object[] comparedValueArray, bool slider = false) {
 		this.comparedPropertyName = comparedPropertyName;
 		this.comparedValueArray = comparedValueArray;
+		this.slider = slider;
 	}
 }

@@ -46,7 +46,11 @@ public class DrawIfAnyPropertyDrawer : PropertyDrawer {
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 		if (ShowMe(property)) {
-			EditorGUI.PropertyField(position, property);
+			if (drawIf.slider) {
+				property.floatValue = EditorGUI.Slider(position, label, property.floatValue, 2, 0);
+			} else {
+				EditorGUI.PropertyField(position, property);
+			}
 		}
 	}
 }

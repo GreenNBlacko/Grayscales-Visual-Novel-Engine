@@ -82,18 +82,17 @@ public class Sentence {
 	[Tooltip("Is the sentence voiced?")]    
 	public bool Voiced;
 
-	[Tooltip("Actions taken when the sentence is played")]
-	public OnSentenceInit[] onSentenceInit;
-
 	[Tooltip("VA clip (will be used if Voiced is is ticked above)")]
 	[DrawIf("Voiced", true)]
 	public AudioClip VoiceClip;
+
+	[Tooltip("Actions taken when the sentence is played")]
+	public OnSentenceInit[] onSentenceInit;
 
 	//not important
 	[SerializeField]
 	public enum Transition { None, FadeOut };
 	public enum ArtworkType { None, BackgroundImage, CGImage };
-	public enum Actioms { None, MoveCharacter, AddCharacterToScene, RemoveCharacterFromScene };
 }
 
 [Serializable]
@@ -108,12 +107,29 @@ public class OnSentenceInit {
 
 	[ArrayToList("GetCharacterNames")]
 	public string CharacterName;
+
 	[ArrayToList("GetCharacterStates", "CharacterName", "actionType", new object[2] { Actions.AddCharacterToScene, Actions.ChangeCharacterState })]
 	public string CharacterState;
-	[DrawIfAny("actionType", new object[2] { Actions.AddCharacterToScene, Actions.MoveCharacter})]
+
+	[DrawIf("actionType", Actions.AddCharacterToScene)]
+	[Tooltip("Should the character enter the scene or just be spawned in?")]
+	public bool EnterScene = true;
+
+	[ConditionalHide("EnterScene", true)]
+	public StartingPlace startingPosition;
+
+	[DrawIf("startingPosition", StartingPlace.Custom, StartingPlace.Custom, "EnterScene", true)]
+	public Vector2 customStartingPosition;
+
+	[Range(2, 0)]
+	public float transitionSpeed = 0.1f;
+
+	[DrawIfAny("actionType", new object[2] { Actions.AddCharacterToScene, Actions.MoveCharacter })]
+	[Tooltip("Position that the character is going to be placed in(2650x1440 base resolution, downscaled bsaed on the screen resolution)")]
 	public Vector2 Position;
 
-	public enum Actions { MoveCharacter, AddCharacterToScene, RemoveCharacterFromScene, ChangeCharacterState };
+	public enum Actions { AddCharacterToScene, MoveCharacter, RemoveCharacterFromScene, ChangeCharacterState };
+	public enum StartingPlace { Left, Right, Custom };
 }
 #endregion
 

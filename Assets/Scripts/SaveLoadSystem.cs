@@ -32,6 +32,7 @@ public class SaveLoadSystem : MonoBehaviour
 		else { loadButton.interactable = false; }
 		quickSaveData = new SaveData();
 		SavedataList = new SaveData[0];
+		QuickLoad();
 		for (int i = 0; i < SavedataList.Length; i++)
 		{
 			Load(i);

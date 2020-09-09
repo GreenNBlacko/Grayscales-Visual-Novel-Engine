@@ -156,6 +156,44 @@ public class DialogueManager : MonoBehaviour {
 						Debug.Log("Choice detected");
 					}
 
+					if(scripts.characterManagerScript == null) {
+						scripts.characterManagerScript = (CharacterManager)FindObjectOfType(typeof(CharacterManager));
+					}
+
+					foreach(OnSentenceInit action in sentence.onSentenceInit) {
+						switch(action.actionType) {
+							case OnSentenceInit.Actions.AddCharacterToScene: {
+									Vector2 startingPosition = new Vector2(0,0);
+
+									switch(action.startingPosition) {
+										case OnSentenceInit.StartingPlace.Left: {
+												startingPosition = new Vector2(-50, 0);
+												break;
+											}
+										case OnSentenceInit.StartingPlace.Right: {
+												startingPosition = new Vector2(2700, 0);
+												break;
+											}
+										case OnSentenceInit.StartingPlace.Custom: {
+												startingPosition = action.customStartingPosition;
+												break;
+											}
+									}
+
+									scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed);
+									break;
+								}
+							case OnSentenceInit.Actions.MoveCharacter: {
+									scripts.characterManagerScript.MoveCharacter(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.transitionSpeed);
+									break;
+								}
+							case OnSentenceInit.Actions.RemoveCharacterFromScene: {
+									scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position);
+									break;
+								}
+						}
+					}
+
 					AddItemToBacklog(BacklogID, scripts.ChapterManagerScript.CurrentChapterIndex, sentence.Name, sentence.Text, currentCharacter, sentence.Voiced, sentence.VoiceClip);
 					BacklogID += 1;
 				} else {
@@ -187,26 +225,6 @@ public class DialogueManager : MonoBehaviour {
 			BacklogEntry choice = quickSaveData.Choices[i];
 			Sentence sentence = scripts.sentenceManager.Chapters[choice.chapterID].Sentences[choice.sentenceID];
 
-
-			if (!currentCharacter.UseSeperateColors) {
-				currentCharacter.NameColor = currentCharacter.Color;
-				currentCharacter.TextColor = currentCharacter.Color;
-			}
-
-			Color32 nameColorGradient = currentCharacter.NameGradientColor;
-			Color32 textColorGradient = currentCharacter.TextGradientColor;
-
-			switch (currentCharacter.gradientType) {
-				case Character.GradientType.Name: {
-						nameColorGradient = currentCharacter.NameGradientColor;
-						break;
-					}
-				case Character.GradientType.Text: {
-						nameColorGradient = currentCharacter.NameGradientColor;
-						break;
-					}
-			}
-
 			AddItemToBacklog(choice.sentenceID, choice.chapterID, sentence.Name, sentence.Text, currentCharacter, sentence.Voiced, sentence.VoiceClip);
 
 		}
@@ -214,6 +232,20 @@ public class DialogueManager : MonoBehaviour {
 		scripts.ChapterManagerScript.CurrentChapterIndex = quickSaveData.ChapterID;
 		buttonArrays.BacklogButtonsArray.GetChild(buttonArrays.BacklogButtonsArray.childCount - 1).GetComponent<BacklogListItem>().Remove();
 		NextSentence();
+	}
+
+	public CharacterState GetCharacterState(string CharacterName, string stateName) {
+		CharacterState characterState = new CharacterState();
+		foreach (Character character in scripts.CharacterInfoScript.Characters) {
+			if (character.CharacterName == CharacterName) {
+				foreach (CharacterState state in character.CharacterStates) {
+					if (state.StateName == stateName) {
+						characterState = state;
+					}
+				}
+			}
+		}
+		return characterState;
 	}
 
 	public void AddItemToBacklog(int ID, int chapterIndex, string name, string sentence, Character currentCharacter, bool voiced, AudioClip voiceClip) {
@@ -291,7 +323,7 @@ public class DialogueManager : MonoBehaviour {
 		}
 	}
 
-	public int GetChildCountInArray(Transform Array) {
+	public static int GetChildCountInArray(Transform Array) {
 		int i = 0;
 		foreach (Transform tr in Array) { ++i; }
 		return i;
@@ -405,6 +437,9 @@ public class Scripts {
 
 	[Tooltip("Manages chapters")]
 	public ChapterManager ChapterManagerScript;
+
+	[Tooltip("Character in scene manager")]
+	public CharacterManager characterManagerScript;
 }
 
 [System.Serializable]
