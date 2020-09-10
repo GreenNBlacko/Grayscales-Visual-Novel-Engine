@@ -112,8 +112,21 @@ public class OnSentenceInit {
 	public string CharacterState;
 
 	[DrawIf("actionType", Actions.AddCharacterToScene)]
+	public bool FadeIn;
+
+	[DrawIf("actionType", Actions.RemoveCharacterFromScene)]
+	public bool FadeOut;
+
+	[Range(1,0)]
+	public float FadeSpeed;
+
+	[DrawIf("actionType", Actions.AddCharacterToScene)]
 	[Tooltip("Should the character enter the scene or just be spawned in?")]
 	public bool EnterScene = true;
+
+	[DrawIf("actionType", Actions.RemoveCharacterFromScene)]
+	[Tooltip("Should the character exit the scene or just be removed?")]
+	public bool ExitScene = true;
 
 	[ConditionalHide("EnterScene", true)]
 	public StartingPlace startingPosition;

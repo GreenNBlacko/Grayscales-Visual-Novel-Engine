@@ -9,7 +9,7 @@ public class CharacterManager : MonoBehaviour {
 	public List<GameObject> CharacterPrefabs;
 	private Dictionary<string, GameObject> CharactersInScene = new Dictionary<string, GameObject>();
 	private CharacterInfo characterInfo = null;
-	public Vector2 resolution = new Vector2(Screen.width, Screen.height);
+	private Vector2 resolution = new Vector2(Screen.width, Screen.height);
 
 	void Start() {
 		characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
@@ -27,7 +27,7 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	public void AddCharacterToScene(string Name, CharacterState state, Vector2 position, bool enterScene = false, Vector2 startingPosition = default, float speed = 0f) {
+	public void AddCharacterToScene(string Name, CharacterState state, Vector2 position, bool enterScene = false, Vector2 startingPosition = default, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
 		if (CharacterArray == null) {
 			Debug.LogError("No Character array gameObject found.");
 			return;
@@ -69,12 +69,13 @@ public class CharacterManager : MonoBehaviour {
 						}
 				}
 
-				StartCoroutine(FadeInCharacter(state, character));
+				if(FadeIn)
+					StartCoroutine(FadeInCharacter(state, character, FadeSpeed));
 
 				character.transform.SetParent(CharacterArray.transform);
 
 				if (enterScene) {
-					StartCoroutine(Lerp(startingPosition, position, speed, character));
+					StartCoroutine(Lerp(startingPosition, position, speed, FadeSpeed,character));
 				} else {
 					character.transform.GetComponent<RectTransform>().position = position;
 				}
@@ -84,7 +85,7 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	public void MoveCharacter(string Name, CharacterState state, Vector2 position, float speed) {
+	public void MoveCharacter(string Name, Vector2 position, float speed) {
 		int index = 0;
 
 		CharactersInScene.TryGetValue(Name, out GameObject character);
@@ -106,14 +107,14 @@ public class CharacterManager : MonoBehaviour {
 
 		characterInfo.Characters[index].CharacterPosition = position;
 
-		StartCoroutine(Lerp(currentPosition, position, speed, character));
+		StartCoroutine(Lerp(currentPosition, position, speed, speed, character));
 	}
 
 	public void ChangeCharacterState() {
 
 	}
 
-	public void RemoveCharacterFromScene(string Name, Vector2 position, bool exitScene = false, float speed = 0f) {
+	public void RemoveCharacterFromScene(string Name, Vector2 position, bool exitScene = false, float speed = 0f, bool FadeOut = false, float FadeSpeed = 0.5f) {
 		int index = 0;
 
 		CharactersInScene.TryGetValue(Name, out GameObject character);
@@ -133,16 +134,15 @@ public class CharacterManager : MonoBehaviour {
 		currentPosition = GetPosition(currentPosition);
 		position = GetPosition(position);
 
-		StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, true));
+		if(FadeOut) 
+			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, FadeSpeed, true));
 
 		characterInfo.Characters[index].CharacterOnScene = false;
 		characterInfo.Characters[index].CharacterPosition = position;
 		characterInfo.Characters[index].CurrentState = null;
 
 		if(exitScene)
-			StartCoroutine(Lerp(currentPosition, position, speed, character));
-		else
-			StartCoroutine(Lerp(currentPosition, position, 0, character));
+			StartCoroutine(Lerp(currentPosition, position, speed, FadeSpeed, character));
 
 		CharactersInScene.Remove(Name);
 	}
@@ -172,7 +172,7 @@ public class CharacterManager : MonoBehaviour {
 		return position;
 	}
 
-	IEnumerator Lerp(Vector2 startingPos, Vector2 Pos, float lerpDuration, GameObject character) {
+	IEnumerator Lerp(Vector2 startingPos, Vector2 Pos, float lerpDuration, float fadeSpeed, GameObject character) {
 		float timeElapsed = 0;
 
 		while (timeElapsed < lerpDuration) {
@@ -184,10 +184,8 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	IEnumerator FadeInCharacter(CharacterState state, GameObject character) {
+	IEnumerator FadeInCharacter(CharacterState state, GameObject character, float lerpDuration = 0.5f) {
 		float timeElapsed = 0;
-
-		float lerpDuration = 0.5f;
 
 		while (timeElapsed < lerpDuration) {
 			switch (state.stateType) {
@@ -219,10 +217,8 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	IEnumerator FadeOutCharacter(CharacterState state, GameObject character, bool destroy = false) {
+	IEnumerator FadeOutCharacter(CharacterState state, GameObject character, float lerpDuration = 0.5f,  bool destroy = false) {
 		float timeElapsed = 0;
-
-		float lerpDuration = 0.5f;
 
 		while (timeElapsed < lerpDuration) {
 			switch (state.stateType) {

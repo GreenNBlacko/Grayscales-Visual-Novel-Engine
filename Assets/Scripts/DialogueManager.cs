@@ -180,15 +180,15 @@ public class DialogueManager : MonoBehaviour {
 											}
 									}
 
-									scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed);
+									scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed);
 									break;
 								}
 							case OnSentenceInit.Actions.MoveCharacter: {
-									scripts.characterManagerScript.MoveCharacter(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.transitionSpeed);
+									scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed);
 									break;
 								}
 							case OnSentenceInit.Actions.RemoveCharacterFromScene: {
-									scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position);
+									scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed);
 									break;
 								}
 						}

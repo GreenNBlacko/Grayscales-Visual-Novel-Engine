@@ -1559,7 +1559,6 @@ MonoBehaviour:
   CharacterArray: {fileID: 1000341074}
   CharacterPrefabs:
   - {fileID: 4530323568431650453, guid: f5bd8ed0f1860324f9920af87a6fa59c, type: 3}
-  resolution: {x: 2650, y: 1440}
 --- !u!1 &321776636
 GameObject:
   m_ObjectHideFlags: 0
@@ -9117,7 +9116,11 @@ MonoBehaviour:
       - actionType: 0
         CharacterName: Yayoi
         CharacterState: Regular_1
+        FadeIn: 0
+        FadeOut: 0
+        FadeSpeed: 0
         EnterScene: 0
+        ExitScene: 1
         startingPosition: 0
         customStartingPosition: {x: 0, y: 0}
         transitionSpeed: 0.7
@@ -9140,7 +9143,11 @@ MonoBehaviour:
       - actionType: 1
         CharacterName: Yayoi
         CharacterState: Regular_1
+        FadeIn: 0
+        FadeOut: 0
+        FadeSpeed: 0
         EnterScene: 0
+        ExitScene: 1
         startingPosition: 1
         customStartingPosition: {x: 0, y: 0}
         transitionSpeed: 0.7
