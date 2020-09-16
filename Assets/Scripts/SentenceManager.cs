@@ -117,6 +117,9 @@ public class OnSentenceInit {
 	[DrawIf("actionType", Actions.RemoveCharacterFromScene)]
 	public bool FadeOut;
 
+	[DrawIf("actionType", Actions.ChangeCharacterState)]
+	public bool Transition;
+
 	[Range(1,0)]
 	public float FadeSpeed;
 

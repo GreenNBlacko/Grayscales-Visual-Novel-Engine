@@ -9116,18 +9116,42 @@ MonoBehaviour:
       - actionType: 0
         CharacterName: Yayoi
         CharacterState: Regular_1
+        FadeIn: 1
+        FadeOut: 0
+        FadeSpeed: 0.5
+        EnterScene: 1
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+  - ChapterName: Chapter 2
+    NextChapter: 1
+    Sentences:
+    - Name: Yayoi
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 1
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 1
+        CharacterName: Yayoi
+        CharacterState: Regular_1
         FadeIn: 0
         FadeOut: 0
         FadeSpeed: 0
         EnterScene: 0
         ExitScene: 1
-        startingPosition: 0
+        startingPosition: 1
         customStartingPosition: {x: 0, y: 0}
         transitionSpeed: 0.7
-        Position: {x: 0, y: 0}
-  - ChapterName: Chapter 2
-    NextChapter: 0
-    Sentences:
+        Position: {x: 500, y: 0}
     - Name: Yayoi
       Text: Testing character manager
       transition: 0
@@ -9151,7 +9175,7 @@ MonoBehaviour:
         startingPosition: 1
         customStartingPosition: {x: 0, y: 0}
         transitionSpeed: 0.7
-        Position: {x: 500, y: 0}
+        Position: {x: 1000, y: 0}
 --- !u!4 &1608444529
 Transform:
   m_ObjectHideFlags: 0

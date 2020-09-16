@@ -167,11 +167,11 @@ public class DialogueManager : MonoBehaviour {
 
 									switch(action.startingPosition) {
 										case OnSentenceInit.StartingPlace.Left: {
-												startingPosition = new Vector2(-50, 0);
+												startingPosition = new Vector2(-150, 0);
 												break;
 											}
 										case OnSentenceInit.StartingPlace.Right: {
-												startingPosition = new Vector2(2700, 0);
+												startingPosition = new Vector2(2800, 0);
 												break;
 											}
 										case OnSentenceInit.StartingPlace.Custom: {
@@ -189,6 +189,10 @@ public class DialogueManager : MonoBehaviour {
 								}
 							case OnSentenceInit.Actions.RemoveCharacterFromScene: {
 									scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed);
+									break;
+								}
+							case OnSentenceInit.Actions.ChangeCharacterState: {
+									scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.FadeSpeed);
 									break;
 								}
 						}
