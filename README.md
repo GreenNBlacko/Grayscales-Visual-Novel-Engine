@@ -24,11 +24,6 @@ My visual novel engine aims for simplicity for the user while having complete co
 - Now, create a simple UI using the prefab given in the prefabs folder.
 - Assign all the variables for the **'DialogueManager'** script.
 - Edit the choice and backlog prefabs to match your preference.
-- Create a Character prefab by making an empty object in the **Characters** object in the inspector, 
-naming it with the character's name, 
-setting the object to be centered on the bottom left corner, 
-setting the size of the object to the right proportions for the character sprites you'll be using and adding in images state images(base and expression for multi-layer characters), 
-then dragging the object into Prefabs/characters and assigning it to **Character Prefabs** in the **CharacterManager** script and removing the object from the inspector. 
 
 That's it! You're ready to create your own visual novel! Good luck in your journey and if you have any problems figuring out the engine--
 
