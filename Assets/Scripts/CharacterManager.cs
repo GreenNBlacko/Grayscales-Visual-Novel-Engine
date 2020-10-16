@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Resources;
 using UnityEngine;
 using UnityEngine.UI;
+using Utilities;
 
 public class CharacterManager : MonoBehaviour {
 	public GameObject CharacterArray = null;
@@ -11,6 +11,7 @@ public class CharacterManager : MonoBehaviour {
 	private CharacterInfo characterInfo = null;
 	private Vector2 resolution = new Vector2(Screen.width, Screen.height);
 	private Dictionary<string, Vector2> TempLerpData = new Dictionary<string, Vector2>();
+	private Coroutine enumerator;
 
 	void Start() {
 		characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
@@ -63,6 +64,11 @@ public class CharacterManager : MonoBehaviour {
 		character.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
 		character.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
 
+		character.AddComponent<Image>();
+		character.GetComponent<Image>().sprite = state.StateImage;
+		character.GetComponent<Image>().SetNativeSize();
+		Destroy(character.GetComponent<Image>());
+
 		GameObject baseLayer = new GameObject();
 
 		baseLayer.transform.SetParent(character.transform);
@@ -72,14 +78,13 @@ public class CharacterManager : MonoBehaviour {
 
 		baseLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
 		baseLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
-		baseLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0,0);
+		baseLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
 
 
 		character.name = Name;
 		switch (state.stateType) {
 			case CharacterState.StateType.SingleLayer: {
 					baseLayer.GetComponent<Image>().sprite = state.StateImage;
-					character.GetComponent<RectTransform>().sizeDelta = new Vector2(state.StateImage.rect.width * state.StateImage.spriteAtlasTextureScale, state.StateImage.rect.height * state.StateImage.spriteAtlasTextureScale);
 					break;
 				}
 			case CharacterState.StateType.MultiLayer: {
@@ -99,8 +104,6 @@ public class CharacterManager : MonoBehaviour {
 					expressionLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
 
 					characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
-
-					character.GetComponent<RectTransform>().sizeDelta = new Vector2(state.BaseImage.texture.width, state.BaseImage.texture.height);
 					break;
 				}
 		}
@@ -119,15 +122,29 @@ public class CharacterManager : MonoBehaviour {
 			character.transform.GetComponent<RectTransform>().position = position;
 		}
 
+		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacterFromState(state).CharacterScale.x, 1 * GetCharacterFromState(state).CharacterScale.y, 1);
+
 		CharactersInScene.Add(Name, characterData);
+	}
+
+	public Character GetCharacterFromState(CharacterState state) {
+		Character temp = new Character();
+
+		foreach (Character character in characterInfo.Characters) {
+			foreach (CharacterState characterState in character.CharacterStates) {
+				if (characterState == state) {
+					temp = character;
+				}
+			}
+		}
+
+		return temp;
 	}
 
 	public void MoveCharacter(string Name, Vector2 position, float speed) {
 		int index = 0;
 
-		CharactersInScene.TryGetValue(Name, out CharacterData character);
-
-		if (character == null) {
+		if (!CharactersInScene.TryGetValue(Name, out CharacterData character)) {
 			Debug.LogError("Character is not in the scene");
 			return;
 		}
@@ -139,19 +156,18 @@ public class CharacterManager : MonoBehaviour {
 
 		Vector2 currentPosition = characterInfo.Characters[index].CharacterPosition;
 
-		TempLerpData.TryGetValue(Name, out Vector2 tempPos);
 
-		if(tempPos != null) {
-			StopCoroutine(Lerp(tempPos, currentPosition, speed, character));
-			TempLerpData.Remove(Name);
+		if (enumerator != null) {
+			if (enumerator.GetProperty<string>("Name") == Name) {
+				StopCoroutine(enumerator);
 
-			position = GetPosition(position);
+				position = GetPosition(position);
 
-			StartCoroutine(Lerp(character.characterGO.transform.position, GetPosition(position), speed, character));
+				enumerator = StartCoroutine(Lerp(character.characterGO.GetComponent<RectTransform>().position, GetPosition(position), speed, character));
 
-			characterInfo.Characters[index].CharacterPosition = position;
-			TempLerpData.Add(Name, character.characterGO.transform.position);
-			return;
+				characterInfo.Characters[index].CharacterPosition = position;
+				return;
+			}
 		}
 
 		currentPosition = GetPosition(currentPosition);
@@ -160,8 +176,7 @@ public class CharacterManager : MonoBehaviour {
 		characterInfo.Characters[index].CharacterPosition = position;
 
 		StartCoroutine(Lerp(currentPosition, position, speed, character));
-		TempLerpData.Add(Name, currentPosition);
-		
+
 	}
 
 	public void ChangeCharacterState(string Name, CharacterState state, bool transition = false, float speed = 0.5f) {
@@ -172,14 +187,24 @@ public class CharacterManager : MonoBehaviour {
 			return;
 		}
 
-		if(transition) {
+		if (transition) {
 			StartCoroutine(TransitionCharacterState(state, character, speed));
 		} else {
-			if(character.ExpressionLayer == null) {
+			if (character.ExpressionLayer == null) {
 				character.BaseLayer.sprite = state.StateImage;
+
+				character.characterGO.AddComponent<Image>();
+				character.characterGO.GetComponent<Image>().sprite = state.StateImage;
+				character.characterGO.GetComponent<Image>().SetNativeSize();
+				Destroy(character.characterGO.GetComponent<Image>());
 			} else {
 				character.BaseLayer.sprite = state.BaseImage;
 				character.ExpressionLayer.sprite = state.StateImage;
+
+				character.characterGO.AddComponent<Image>();
+				character.characterGO.GetComponent<Image>().sprite = state.StateImage;
+				character.characterGO.GetComponent<Image>().SetNativeSize();
+				Destroy(character.characterGO.GetComponent<Image>());
 			}
 		}
 	}
@@ -204,15 +229,17 @@ public class CharacterManager : MonoBehaviour {
 		currentPosition = GetPosition(currentPosition);
 		position = GetPosition(position);
 
-		if(FadeOut) 
-			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, FadeSpeed, true));
-
 		characterInfo.Characters[index].CharacterOnScene = false;
 		characterInfo.Characters[index].CharacterPosition = position;
 		characterInfo.Characters[index].CurrentState = null;
 
-		if(exitScene)
+		if (exitScene)
 			StartCoroutine(Lerp(currentPosition, position, speed, character));
+
+		if (FadeOut)
+			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, FadeSpeed, true));
+		else
+			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, 0f, true));
 
 		CharactersInScene.Remove(Name);
 	}
@@ -246,6 +273,7 @@ public class CharacterManager : MonoBehaviour {
 		float timeElapsed = 0;
 
 		while (timeElapsed < lerpDuration) {
+
 			character.characterGO.transform.GetComponent<RectTransform>().position = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
 
 			timeElapsed += Time.deltaTime;
@@ -253,6 +281,7 @@ public class CharacterManager : MonoBehaviour {
 			yield return null;
 		}
 		TempLerpData.Remove(character.characterGO.name);
+		enumerator = null;
 	}
 
 	IEnumerator FadeInCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
@@ -261,7 +290,7 @@ public class CharacterManager : MonoBehaviour {
 		while (timeElapsed < lerpDuration) {
 			switch (state.stateType) {
 				case CharacterState.StateType.SingleLayer: {
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte) Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
+						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
 						break;
 					}
 				case CharacterState.StateType.MultiLayer: {
@@ -289,99 +318,145 @@ public class CharacterManager : MonoBehaviour {
 	}
 
 	IEnumerator TransitionCharacterState(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
-		float timeElapsed = 0;
-		float timeElapsed2 = 0;
+		switch (state.stateType) {
+			case CharacterState.StateType.SingleLayer: {
+					float timeElapsed = 0;
+					GameObject baselayer = character.BaseLayer.gameObject;
 
-		GameObject baselayer = character.BaseLayer.gameObject;
-		GameObject expressionlayer = null;
+					GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
 
-		if(state.stateType == CharacterState.StateType.MultiLayer) {
-			expressionlayer = character.ExpressionLayer.gameObject;
-		}
+					baseLayer.transform.SetParent(character.characterGO.transform);
 
-		if(state.BaseImage != character.BaseLayer.sprite || state.StateImage != character.BaseLayer.sprite) {
-			GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
+					baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
+					baseLayer.GetComponent<Image>().sprite = state.StateImage;
 
-			baseLayer.transform.SetParent(character.characterGO.transform);
+					character.BaseLayer = baseLayer.GetComponent<Image>();
 
-			baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
+					character.BaseLayer.color = new Color32(255, 255, 255, 0);
 
-			character.BaseLayer = baseLayer.GetComponent<Image>();
+					while (timeElapsed < lerpDuration) {
 
-			switch (state.stateType) {
-				case CharacterState.StateType.SingleLayer: {
-						baseLayer.GetComponent<Image>().sprite = state.StateImage;
-						break;
+						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+
+						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
+
+						timeElapsed += Time.deltaTime;
+
+						yield return null;
 					}
-				case CharacterState.StateType.MultiLayer: {
+
+					break;
+				}
+			case CharacterState.StateType.MultiLayer: {
+					if(character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
+						float timeElapsed = 0;
+						GameObject baselayer = character.BaseLayer.gameObject;
+
+						GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
+
+						baseLayer.transform.SetParent(character.characterGO.transform);
+
+						baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
+						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
+
+						character.BaseLayer = baseLayer.GetComponent<Image>();
+
+						character.BaseLayer.color = new Color32(255, 255, 255, 0);
+
+						GameObject expressionlayer = character.ExpressionLayer.gameObject;
+
 						GameObject expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
 
 						expressionLayer.transform.SetParent(character.characterGO.transform);
 
-						expressionLayer.AddComponent<RectTransform>();
-						expressionLayer.AddComponent<Image>();
-
+						expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
 						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-
-						expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionlayer.GetComponent<RectTransform>().sizeDelta;
 
 						character.ExpressionLayer = expressionLayer.GetComponent<Image>();
 
+						character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+
+
+						while (timeElapsed < lerpDuration) {
+
+							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+
+							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+
+							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+
+							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+
+							timeElapsed += Time.deltaTime;
+
+							yield return null;
+						}
+
+						Destroy(baselayer);
+						Destroy(expressionlayer);
+						break;
+					}
+					if (character.BaseLayer.sprite != state.BaseImage) {
+						float timeElapsed = 0;
+						GameObject baselayer = character.BaseLayer.gameObject;
+
+						GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
+
+						baseLayer.transform.SetParent(character.characterGO.transform);
+
+						baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
 						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-						break;
+
+						character.BaseLayer = baseLayer.GetComponent<Image>();
+
+						character.BaseLayer.color = new Color32(255, 255, 255, 0);
+
+						while (timeElapsed < lerpDuration) {
+
+							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+
+							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+
+							timeElapsed += Time.deltaTime;
+
+							yield return null;
+						}
+
+						Destroy(baselayer);
 					}
-			}
-		}
+					if (character.ExpressionLayer.sprite != state.StateImage) {
+						float timeElapsed = 0;
+						GameObject expressionlayer = character.ExpressionLayer.gameObject;
 
-		while (timeElapsed < lerpDuration && timeElapsed2 < lerpDuration) {
-			switch (state.stateType) {
-				case CharacterState.StateType.SingleLayer: {
-						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						break;
+						GameObject expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
+
+						expressionLayer.transform.SetParent(character.characterGO.transform);
+
+						expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
+						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+
+						character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+
+						character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+
+						while (timeElapsed < lerpDuration) {
+
+							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+
+							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+
+							timeElapsed += Time.deltaTime;
+
+							yield return null;
+						}
+						Destroy(expressionlayer);
 					}
-				case CharacterState.StateType.MultiLayer: {
-						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						break;
-					}
-			}
-
-			timeElapsed += Time.deltaTime;
-
-			if(timeElapsed / lerpDuration <= 0.5f) {
-				while (timeElapsed2 < lerpDuration) {
-					switch (state.stateType) {
-						case CharacterState.StateType.SingleLayer: {
-								character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed2 / lerpDuration));
-								break;
-							}
-						case CharacterState.StateType.MultiLayer: {
-								character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed2 / lerpDuration));
-								character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed2 / lerpDuration));
-								break;
-							}
-					}
-
-					timeElapsed2 += Time.deltaTime;
-
-					yield return null;
-				}
-			}
-
-			yield return null;
-		}
-
-		Destroy(baselayer);
-
-		switch(state.stateType) {
-			case CharacterState.StateType.MultiLayer: {
-					Destroy(expressionlayer);
 					break;
 				}
 		}
 	}
 
-	IEnumerator FadeOutCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f,  bool destroy = false) {
+	IEnumerator FadeOutCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f, bool destroy = false) {
 		float timeElapsed = 0;
 
 		while (timeElapsed < lerpDuration) {
@@ -400,17 +475,6 @@ public class CharacterManager : MonoBehaviour {
 			timeElapsed += Time.deltaTime;
 
 			yield return null;
-		}
-		switch (state.stateType) {
-			case CharacterState.StateType.SingleLayer: {
-					character.BaseLayer.color = new Color32(255, 255, 255, 0);
-					break;
-				}
-			case CharacterState.StateType.MultiLayer: {
-					character.BaseLayer.color = new Color32(255, 255, 255, 0);
-					character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
-					break;
-				}
 		}
 
 		if (destroy) {

@@ -111,6 +111,8 @@ public class OnSentenceInit {
 	[ArrayToList("GetCharacterStates", "CharacterName", "actionType", new object[2] { Actions.AddCharacterToScene, Actions.ChangeCharacterState })]
 	public string CharacterState;
 
+	public float Delay;
+
 	[DrawIf("actionType", Actions.AddCharacterToScene)]
 	public bool FadeIn;
 
@@ -144,7 +146,7 @@ public class OnSentenceInit {
 	[Tooltip("Position that the character is going to be placed in(2650x1440 base resolution, downscaled bsaed on the screen resolution)")]
 	public Vector2 Position;
 
-	public enum Actions { AddCharacterToScene, MoveCharacter, RemoveCharacterFromScene, ChangeCharacterState };
+	public enum Actions { AddCharacterToScene, MoveCharacter, RemoveCharacterFromScene, ChangeCharacterState, Delay };
 	public enum StartingPlace { Left, Right, Custom };
 }
 #endregion

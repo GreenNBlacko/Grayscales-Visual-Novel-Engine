@@ -476,7 +476,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 69.35791, y: -184}
+  m_AnchoredPosition: {x: 49.166748, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &67567083
@@ -893,7 +893,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 569.3579, y: -284}
+  m_AnchoredPosition: {x: 749.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &147927944
@@ -1361,6 +1361,7 @@ MonoBehaviour:
   DefaultCharacterPic: {fileID: 0}
   Characters:
   - CharacterName: Yayoi
+    CharacterScale: {x: 1, y: 1}
     CharacterStates:
     - StateName: Regular_1
       stateType: 0
@@ -1403,20 +1404,27 @@ MonoBehaviour:
       stateType: 0
       BaseImage: {fileID: 0}
       StateImage: {fileID: 0}
-  - CharacterName: Test Character 2
+  - CharacterName: Raelin
+    CharacterScale: {x: 1.7, y: 1.7}
     CharacterStates:
-    - StateName: a
-      stateType: 0
-      BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
-    - StateName: C
-      stateType: 0
-      BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
-    - StateName: BC
-      stateType: 0
-      BaseImage: {fileID: 0}
-      StateImage: {fileID: 0}
+    - StateName: 1
+      stateType: 1
+      BaseImage: {fileID: 4945437208809926602, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
+      StateImage: {fileID: -7166449183496246901, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
+    - StateName: 2
+      stateType: 1
+      BaseImage: {fileID: 804702572747838577, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
+      StateImage: {fileID: -5762127200797985675, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
+    - StateName: 3
+      stateType: 1
+      BaseImage: {fileID: 8493238466760559169, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
+      StateImage: {fileID: -156649955218105828, guid: 080669626e3c73441a91d6084a8f355e,
+        type: 3}
     CharacterPic: {fileID: 0}
     UseSeperateColors: 0
     Color:
@@ -1447,6 +1455,7 @@ MonoBehaviour:
       BaseImage: {fileID: 0}
       StateImage: {fileID: 0}
   - CharacterName: Test Character 3
+    CharacterScale: {x: 0, y: 0}
     CharacterStates:
     - StateName: 1
       stateType: 0
@@ -1557,8 +1566,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CharacterArray: {fileID: 1000341074}
-  CharacterPrefabs:
-  - {fileID: 4530323568431650453, guid: f5bd8ed0f1860324f9920af87a6fa59c, type: 3}
 --- !u!1 &321776636
 GameObject:
   m_ObjectHideFlags: 0
@@ -1595,7 +1602,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 269.3579, y: -184}
+  m_AnchoredPosition: {x: 249.16669, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &321776638
@@ -1849,7 +1856,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 169.35791, y: -384}
+  m_AnchoredPosition: {x: 549.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &392500784
@@ -2103,7 +2110,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 569.3579, y: -184}
+  m_AnchoredPosition: {x: 549.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &420217466
@@ -2223,7 +2230,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 469.3579, y: -284}
+  m_AnchoredPosition: {x: 649.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &457541804
@@ -2343,7 +2350,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1169.3579, y: -184}
+  m_AnchoredPosition: {x: 149.16669, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &463794973
@@ -2731,7 +2738,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 169.35791, y: -284}
+  m_AnchoredPosition: {x: 349.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &493516300
@@ -3253,7 +3260,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1169.3579, y: -284}
+  m_AnchoredPosition: {x: 349.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &616370422
@@ -3373,7 +3380,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 769.3579, y: -184}
+  m_AnchoredPosition: {x: 749.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &635791953
@@ -4543,7 +4550,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 369.3579, y: -284}
+  m_AnchoredPosition: {x: 549.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &843619961
@@ -4663,7 +4670,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 269.3579, y: -384}
+  m_AnchoredPosition: {x: 649.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &843960112
@@ -4783,7 +4790,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 969.3579, y: -284}
+  m_AnchoredPosition: {x: 149.16669, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &846874959
@@ -5199,13 +5206,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dummy Text
+  m_text: 'Dummy Text
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 880f5c60d5a0c93438a6fa2972100289, type: 2}
   m_sharedMaterial: {fileID: 4237668254498557998, guid: 880f5c60d5a0c93438a6fa2972100289,
@@ -5233,10 +5242,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
+  m_fontSize: 50
   m_fontSizeBase: 32
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 1
@@ -5246,7 +5255,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
-  m_lineSpacingMax: 0
+  m_lineSpacingMax: -40
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
@@ -6215,7 +6224,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1069.3579, y: -184}
+  m_AnchoredPosition: {x: 49.166748, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1252329221
@@ -6681,7 +6690,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 669.3579, y: -184}
+  m_AnchoredPosition: {x: 649.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1351256330
@@ -6935,7 +6944,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 369.3579, y: -184}
+  m_AnchoredPosition: {x: 349.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1360629044
@@ -7098,7 +7107,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -7112,7 +7121,7 @@ MonoBehaviour:
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
-  m_textAlignment: 257
+  m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -7189,7 +7198,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 769.3579, y: -284}
+  m_AnchoredPosition: {x: 949.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1372916446
@@ -8070,7 +8079,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 7, y: -7}
-  m_SizeDelta: {x: 345.9, y: 51.5}
+  m_SizeDelta: {x: 593.6217, y: 51.5}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1448399164
 MonoBehaviour:
@@ -8086,7 +8095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -8120,10 +8129,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
+  m_fontSize: 37.8
   m_fontSizeBase: 32
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
@@ -8474,7 +8483,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 69.35791, y: -384}
+  m_AnchoredPosition: {x: 449.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1472425867
@@ -8862,7 +8871,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 869.3579, y: -284}
+  m_AnchoredPosition: {x: 49.166748, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1534317346
@@ -8982,7 +8991,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 269.3579, y: -284}
+  m_AnchoredPosition: {x: 449.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1547712809
@@ -9116,8 +9125,10 @@ MonoBehaviour:
       - actionType: 0
         CharacterName: Yayoi
         CharacterState: Regular_1
+        Delay: 0
         FadeIn: 1
         FadeOut: 0
+        Transition: 0
         FadeSpeed: 0.5
         EnterScene: 1
         ExitScene: 1
@@ -9126,7 +9137,7 @@ MonoBehaviour:
         transitionSpeed: 0.7
         Position: {x: 1000, y: 0}
   - ChapterName: Chapter 2
-    NextChapter: 1
+    NextChapter: 2
     Sentences:
     - Name: Yayoi
       Text: Testing character manager
@@ -9143,8 +9154,131 @@ MonoBehaviour:
       - actionType: 1
         CharacterName: Yayoi
         CharacterState: Regular_1
+        Delay: 0
         FadeIn: 0
         FadeOut: 0
+        Transition: 0
+        FadeSpeed: 0
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 500, y: 0}
+    - Name: Yayoi
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 0
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 3
+        CharacterName: Yayoi
+        CharacterState: Scared_2
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+      - actionType: 0
+        CharacterName: Raelin
+        CharacterState: 2
+        Delay: 0
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 1
+        ExitScene: 1
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+    - Name: Raelin
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 0
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 1
+        CharacterName: Raelin
+        CharacterState: Regular_1
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 0
+        FadeSpeed: 0
+        EnterScene: 0
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0
+        Position: {x: 1500, y: 0}
+    - Name: Raelin
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 0
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 3
+        CharacterName: Raelin
+        CharacterState: 1
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+  - ChapterName: Chapter 3
+    NextChapter: 2
+    Sentences:
+    - Name: Yayoi
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 1
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 1
+        CharacterName: Yayoi
+        CharacterState: Regular_1
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 0
         FadeSpeed: 0
         EnterScene: 0
         ExitScene: 1
@@ -9166,10 +9300,106 @@ MonoBehaviour:
       onSentenceInit:
       - actionType: 1
         CharacterName: Yayoi
-        CharacterState: Regular_1
+        CharacterState: Shocked_1
+        Delay: 0
         FadeIn: 0
         FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1600, y: 0}
+      - actionType: 1
+        CharacterName: Yayoi
+        CharacterState: 2
+        Delay: 0
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 1
+        ExitScene: 1
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+    - Name: Raelin
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 0
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 1
+        CharacterName: Raelin
+        CharacterState: Regular_1
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 0
         FadeSpeed: 0
+        EnterScene: 0
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0
+        Position: {x: 1500, y: 0}
+    - Name: Raelin
+      Text: Testing character manager
+      transition: 0
+      artworkType: 1
+      BG_ID: 0
+      CG_ID: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 0
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 3
+        CharacterName: Raelin
+        CharacterState: 2
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+      - actionType: 4
+        CharacterName: Raelin
+        CharacterState: 3
+        Delay: 1.5
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
+        EnterScene: 0
+        ExitScene: 1
+        startingPosition: 1
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 1000, y: 0}
+      - actionType: 3
+        CharacterName: Raelin
+        CharacterState: 3
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.5
         EnterScene: 0
         ExitScene: 1
         startingPosition: 1
@@ -9316,7 +9546,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1069.3579, y: -284}
+  m_AnchoredPosition: {x: 249.16669, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1632016300
@@ -9708,7 +9938,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 869.3579, y: -184}
+  m_AnchoredPosition: {x: 849.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1712526757
@@ -9828,7 +10058,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 469.3579, y: -184}
+  m_AnchoredPosition: {x: 449.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1730522058
@@ -9948,7 +10178,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 569.3579, y: -384}
+  m_AnchoredPosition: {x: 949.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1731981066
@@ -10243,7 +10473,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 969.3579, y: -184}
+  m_AnchoredPosition: {x: 949.1667, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1800214679
@@ -10363,7 +10593,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 69.35791, y: -284}
+  m_AnchoredPosition: {x: 249.16669, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1859884714
@@ -10483,7 +10713,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 469.3579, y: -384}
+  m_AnchoredPosition: {x: 849.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1868691227
@@ -11075,7 +11305,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 169.35791, y: -184}
+  m_AnchoredPosition: {x: 149.16669, y: -184}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1948296918
@@ -11816,7 +12046,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 669.3579, y: -284}
+  m_AnchoredPosition: {x: 849.1667, y: -284}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2053415683
@@ -11936,7 +12166,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 369.3579, y: -384}
+  m_AnchoredPosition: {x: 749.1667, y: -384}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2064518090

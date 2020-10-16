@@ -8,11 +8,15 @@ public class CharacterInfo : MonoBehaviour
     public Sprite DefaultCharacterPic;
 
     public Character[] Characters;
+
 }
 
 [Serializable]
 public class Character {
     public string CharacterName;
+
+    [Tooltip("The scale of the character's sprites(1 is default)")]
+    public Vector2 CharacterScale = new Vector2(1, 1);
 
     [Tooltip("character's emotions and appearance")]
     public CharacterState[] CharacterStates;

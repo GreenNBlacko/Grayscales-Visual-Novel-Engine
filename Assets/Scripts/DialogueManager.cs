@@ -156,47 +156,7 @@ public class DialogueManager : MonoBehaviour {
 						Debug.Log("Choice detected");
 					}
 
-					if(scripts.characterManagerScript == null) {
-						scripts.characterManagerScript = (CharacterManager)FindObjectOfType(typeof(CharacterManager));
-					}
-
-					foreach(OnSentenceInit action in sentence.onSentenceInit) {
-						switch(action.actionType) {
-							case OnSentenceInit.Actions.AddCharacterToScene: {
-									Vector2 startingPosition = new Vector2(0,0);
-
-									switch(action.startingPosition) {
-										case OnSentenceInit.StartingPlace.Left: {
-												startingPosition = new Vector2(-150, 0);
-												break;
-											}
-										case OnSentenceInit.StartingPlace.Right: {
-												startingPosition = new Vector2(2800, 0);
-												break;
-											}
-										case OnSentenceInit.StartingPlace.Custom: {
-												startingPosition = action.customStartingPosition;
-												break;
-											}
-									}
-
-									scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed);
-									break;
-								}
-							case OnSentenceInit.Actions.MoveCharacter: {
-									scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed);
-									break;
-								}
-							case OnSentenceInit.Actions.RemoveCharacterFromScene: {
-									scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed);
-									break;
-								}
-							case OnSentenceInit.Actions.ChangeCharacterState: {
-									scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.FadeSpeed);
-									break;
-								}
-						}
-					}
+					StartCoroutine(CallOnSentenceInit(sentence));
 
 					AddItemToBacklog(BacklogID, scripts.ChapterManagerScript.CurrentChapterIndex, sentence.Name, sentence.Text, currentCharacter, sentence.Voiced, sentence.VoiceClip);
 					BacklogID += 1;
@@ -223,7 +183,57 @@ public class DialogueManager : MonoBehaviour {
 		}
 	}
 
+	public IEnumerator CallOnSentenceInit(Sentence sentence) {
+		if (scripts.characterManagerScript == null) {
+			scripts.characterManagerScript = (CharacterManager)FindObjectOfType(typeof(CharacterManager));
+		}
+
+		foreach (OnSentenceInit action in sentence.onSentenceInit) {
+			switch (action.actionType) {
+				case OnSentenceInit.Actions.AddCharacterToScene: {
+						Vector2 startingPosition = new Vector2(0, 0);
+
+						switch (action.startingPosition) {
+							case OnSentenceInit.StartingPlace.Left: {
+									startingPosition = new Vector2(-150, 0);
+									break;
+								}
+							case OnSentenceInit.StartingPlace.Right: {
+									startingPosition = new Vector2(2800, 0);
+									break;
+								}
+							case OnSentenceInit.StartingPlace.Custom: {
+									startingPosition = action.customStartingPosition;
+									break;
+								}
+						}
+
+						scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.MoveCharacter: {
+						scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.RemoveCharacterFromScene: {
+						scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.ChangeCharacterState: {
+						scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.FadeSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.Delay: {
+						yield return new WaitForSeconds(action.Delay);
+						continue;
+					}
+			}
+		}
+	}
+
 	public void QuickLoadChapter(SaveData quickSaveData) {
+		StopAllCoroutines();
+		ShowTextRun = false;
 		foreach (Transform backlogEntry in buttonArrays.BacklogButtonsArray) { backlogEntry.GetComponent<BacklogListItem>().Remove(); }
 		for (int i = 0; i < quickSaveData.Choices.Count; i++) {
 			BacklogEntry choice = quickSaveData.Choices[i];

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -77,7 +78,7 @@ public class JSONSentenceImporter : MonoBehaviour {
 			data.characterData = new CharData[1];
 			data.characterData[0] = new CharData();
 
-			string tmp = JsonUtility.ToJson(data);
+			string tmp = JsonUtility.ToJson(data, true);
 			File.WriteAllText("Assets/Sentences/SentenceData.json", tmp);
 		}
 	}
@@ -117,35 +118,81 @@ public class sent {
 	public bool Voiced;
 
 	public string VoiceClip;
+
+	public SentenceActionData[] sentenceActions;
 }
 
-[System.Serializable]
+[Serializable]
+public class SentenceActionData {
+	[JsonConverter(typeof(StringEnumConverter))]
+	public OnSentenceInit.Actions ActionType;
+
+	public bool FadeIn;
+	public bool FadeOut;
+	public bool Transition;
+
+	public float FadeSpeed;
+	public float TransitionSpeed;
+
+	public int startingPosition;
+	public Vector2 customStartingPosition;
+
+	public Vector2 position;
+
+	public string CharacterName;
+	public string StateName;
+
+	public string BGMName;
+
+	public float Delay;
+}
+
+[Serializable]
 public class CharData {
 	public string characterName;
 
-	public bool useSeperateColors = false;
+	public CharacterStateData[] characterStates;
 
-	public byte[] colorRGB = new byte[0];
-	public string colorHex = "";
+	public bool useSeperateColors;
 
-	public byte[] nameColorRGB = new byte[0];
-	public string nameColorHex = "";
-
-	public byte[] textColorRGB = new byte[0];
-	public string textColorHex = "";
+	public string colorHex;
+	public byte[] colorRGB;
+	public string nameColorHex;
+	public byte[] nameColorRGB;
+	public string textColorHex;
+	public byte[] textColorRGB;
 
 	[JsonConverter(typeof(StringEnumConverter))]
 	public Character.GradientType gradientType = Character.GradientType.None;
 
-	public bool useSeperateGradientColors = false;
+	public bool useSeperateGradientColors;
 
-	public byte[] nameColorGradientRGB = new byte[0];
-	public string nameColorGradientHex = "";
+	public string colorGradientHex;
+	public byte[] colorGradientRGB;
+	public string nameColorGradientHex;
+	public byte[] nameColorGradientRGB;
+	public string textColorGradientHex;
+	public byte[] textColorGradientRGB;
+}
 
-	public byte[] textColorGradientRGB = new byte[0];
-	public string textColorGradientHex = "";
+[Serializable]
+public class CharacterStateData {
+	public string StateName;
+	public int StateType;
+	public string BaseLayerImagePath;
+	public string ExpressionLayerImagePath;
+}
 
-	public byte[] colorGradientRGB = new byte[0];
-	public string colorGradientHex = "";
+[Serializable]
+public class ArtworkData {
+	public string ArtworkName;
+	public int ArtworkType;
+	public string ArtworkPath;
+}
+
+[Serializable]
+public class BGMData {
+	public string BGMName;
+	public string BGMPath;
 }
 
