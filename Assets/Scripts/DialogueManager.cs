@@ -275,9 +275,7 @@ public class DialogueManager : MonoBehaviour {
 	}
 
 	public void PlayVoice(AudioClip voiceClip) {
-		audioSources.VoiceAudioSource.Stop();
-		audioSources.VoiceAudioSource.clip = voiceClip;
-		audioSources.VoiceAudioSource.Play();
+
 	}
 
 	public IEnumerator ShowText(int ID) {
