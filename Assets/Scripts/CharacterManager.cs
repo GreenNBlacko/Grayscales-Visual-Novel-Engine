@@ -11,7 +11,7 @@ public class CharacterManager : MonoBehaviour {
 	private CharacterInfo characterInfo = null;
 	private Vector2 resolution = new Vector2(Screen.width, Screen.height);
 	private Dictionary<string, Vector2> TempLerpData = new Dictionary<string, Vector2>();
-	private Coroutine enumerator;
+	private Dictionary<string, Coroutine> enumerators = new Dictionary<string, Coroutine>();
 
 	void Start() {
 		characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
@@ -117,7 +117,7 @@ public class CharacterManager : MonoBehaviour {
 		character.transform.SetParent(CharacterArray.transform);
 
 		if (enterScene) {
-			StartCoroutine(Lerp(startingPosition, position, speed, characterData));
+			enumerators.Add(Name, StartCoroutine(Lerp(startingPosition, position, speed, characterData)));
 		} else {
 			character.transform.GetComponent<RectTransform>().position = position;
 		}
@@ -157,17 +157,21 @@ public class CharacterManager : MonoBehaviour {
 		Vector2 currentPosition = characterInfo.Characters[index].CharacterPosition;
 
 
-		if (enumerator != null) {
-			if (enumerator.GetProperty<string>("Name") == Name) {
-				StopCoroutine(enumerator);
+		if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
+			StopCoroutine(enumerator);
 
-				position = GetPosition(position);
+			position = GetPosition(position);
 
-				enumerator = StartCoroutine(Lerp(character.characterGO.GetComponent<RectTransform>().position, GetPosition(position), speed, character));
+			TempLerpData.TryGetValue(Name, out Vector2 tempPos);
 
-				characterInfo.Characters[index].CharacterPosition = position;
-				return;
-			}
+			enumerators.Remove(Name);
+
+			TempLerpData.Remove(Name);
+
+			enumerators.Add(Name, StartCoroutine(Lerp(tempPos, position, speed, character)));
+
+			characterInfo.Characters[index].CharacterPosition = position;
+			return;
 		}
 
 		currentPosition = GetPosition(currentPosition);
@@ -175,8 +179,7 @@ public class CharacterManager : MonoBehaviour {
 
 		characterInfo.Characters[index].CharacterPosition = position;
 
-		StartCoroutine(Lerp(currentPosition, position, speed, character));
-
+		enumerators.Add(Name, StartCoroutine(Lerp(currentPosition, position, speed, character)));
 	}
 
 	public void ChangeCharacterState(string Name, CharacterState state, bool transition = false, float speed = 0.5f) {
@@ -272,16 +275,22 @@ public class CharacterManager : MonoBehaviour {
 	IEnumerator Lerp(Vector2 startingPos, Vector2 Pos, float lerpDuration, CharacterData character) {
 		float timeElapsed = 0;
 
+		TempLerpData.Add(character.characterGO.name, new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration)));
+
 		while (timeElapsed < lerpDuration) {
 
 			character.characterGO.transform.GetComponent<RectTransform>().position = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
+
+			if (TempLerpData.TryGetValue(character.characterGO.name, out Vector2 tempPos))
+				TempLerpData[character.characterGO.name] = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
+			
 
 			timeElapsed += Time.deltaTime;
 
 			yield return null;
 		}
+		enumerators.Remove(character.characterGO.name);
 		TempLerpData.Remove(character.characterGO.name);
-		enumerator = null;
 	}
 
 	IEnumerator FadeInCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
@@ -338,7 +347,7 @@ public class CharacterManager : MonoBehaviour {
 
 						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
+						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
 
 						timeElapsed += Time.deltaTime;
 
@@ -348,7 +357,7 @@ public class CharacterManager : MonoBehaviour {
 					break;
 				}
 			case CharacterState.StateType.MultiLayer: {
-					if(character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
+					if (character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
 						float timeElapsed = 0;
 						GameObject baselayer = character.BaseLayer.gameObject;
 
