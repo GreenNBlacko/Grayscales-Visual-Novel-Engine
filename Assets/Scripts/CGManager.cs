@@ -29,8 +29,9 @@ public class CGManager : MonoBehaviour {
 	}
 
 	public void CreateArtworkObject(Transform list, Sprite Artwork) {
-		GameObject art = new GameObject(name = Artwork.name);
+		GameObject art = new GameObject();
 		art.transform.SetParent(list);
+		art.name = Artwork.name;
 		RectTransform tr = art.AddComponent<RectTransform>();
 		Image temp = art.AddComponent<Image>();
 		temp.sprite = Artwork;

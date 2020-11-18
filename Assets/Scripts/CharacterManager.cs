@@ -38,7 +38,7 @@ public class CharacterManager : MonoBehaviour {
 		CharactersInScene.TryGetValue(Name, out CharacterData tempchar);
 
 		if (tempchar != null) {
-			Debug.LogError("Character is already in the scene scene.");
+			Debug.LogError("Character is already in the scene.");
 			return;
 		}
 
@@ -122,18 +122,19 @@ public class CharacterManager : MonoBehaviour {
 			character.transform.GetComponent<RectTransform>().position = position;
 		}
 
-		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacterFromState(state).CharacterScale.x, 1 * GetCharacterFromState(state).CharacterScale.y, 1);
+		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacter(Name, state).CharacterScale.x, 1 * GetCharacter(Name, state).CharacterScale.y, 1);
 
 		CharactersInScene.Add(Name, characterData);
 	}
 
-	public Character GetCharacterFromState(CharacterState state) {
+	public Character GetCharacter(string Name, CharacterState state) {
 		Character temp = new Character();
 
 		foreach (Character character in characterInfo.Characters) {
+			if(character.CharacterName != Name) { continue; }
 			foreach (CharacterState characterState in character.CharacterStates) {
 				if (characterState == state) {
-					temp = character;
+					return character;
 				}
 			}
 		}
@@ -158,6 +159,7 @@ public class CharacterManager : MonoBehaviour {
 
 
 		if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
+			Debug.Log(Name);
 			StopCoroutine(enumerator);
 
 			position = GetPosition(position);

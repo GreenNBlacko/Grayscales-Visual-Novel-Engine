@@ -108,46 +108,40 @@ public class OnSentenceInit {
 	[ArrayToList("GetCharacterNames")]
 	public string CharacterName;
 
-	[ArrayToList("GetCharacterStates", "CharacterName", "actionType", new object[2] { Actions.AddCharacterToScene, Actions.ChangeCharacterState })]
+	[ArrayToList("GetCharacterStates", "CharacterName")]
 	public string CharacterState;
 
+	[Tooltip("Wait x seconds before executing the next action")]
 	public float Delay;
 
-	[DrawIf("actionType", Actions.AddCharacterToScene)]
 	public bool FadeIn;
 
-	[DrawIf("actionType", Actions.RemoveCharacterFromScene)]
 	public bool FadeOut;
 
-	[DrawIf("actionType", Actions.ChangeCharacterState)]
 	public bool Transition;
 
 	[Range(1,0)]
 	public float FadeSpeed;
 
-	[DrawIf("actionType", Actions.AddCharacterToScene)]
 	[Tooltip("Should the character enter the scene or just be spawned in?")]
 	public bool EnterScene = true;
 
-	[DrawIf("actionType", Actions.RemoveCharacterFromScene)]
 	[Tooltip("Should the character exit the scene or just be removed?")]
 	public bool ExitScene = true;
 
-	[ConditionalHide("EnterScene", true)]
 	public StartingPlace startingPosition;
 
-	[DrawIf("startingPosition", StartingPlace.Custom, StartingPlace.Custom, "EnterScene", true)]
 	public Vector2 customStartingPosition;
 
 	[Range(2, 0)]
 	public float transitionSpeed = 0.1f;
 
-	[DrawIfAny("actionType", new object[2] { Actions.AddCharacterToScene, Actions.MoveCharacter })]
 	[Tooltip("Position that the character is going to be placed in(2650x1440 base resolution, downscaled bsaed on the screen resolution)")]
 	public Vector2 Position;
 
 	public enum Actions { AddCharacterToScene, MoveCharacter, RemoveCharacterFromScene, ChangeCharacterState, Delay };
 	public enum StartingPlace { Left, Right, Custom };
 }
+
 #endregion
 
