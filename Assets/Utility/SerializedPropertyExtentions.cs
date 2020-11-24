@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-
+#if UNITY_EDITOR
 namespace Utilities
 {
     public static class SerializedPropertyExtentions
@@ -10,3 +10,4 @@ namespace Utilities
         }
     }
 }
+#endif

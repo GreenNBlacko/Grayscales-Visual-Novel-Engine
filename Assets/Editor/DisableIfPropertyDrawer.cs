@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -72,3 +71,4 @@ public class DisableIfPropertyDrawer : PropertyDrawer {
 		}
 	}
 }
+#endif

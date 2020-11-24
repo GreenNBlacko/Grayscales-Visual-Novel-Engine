@@ -1284,8 +1284,9 @@ MonoBehaviour:
       type: 3}
     ChoiceButtonPreset: {fileID: 6933249188246227455, guid: c8a443766798c124fab56c19ab0db047,
       type: 3}
-  VoiceAudioSources: {fileID: 0}
-  currentVoiceClip: {fileID: 0}
+  audioSources:
+    VoiceAudioSource: {fileID: 0}
+    MusicAudioSource: {fileID: 0}
   scripts:
     CGManagerScript: {fileID: 228308017}
     sentenceManager: {fileID: 1608444528}
@@ -1365,15 +1366,15 @@ MonoBehaviour:
     - StateName: Regular_1
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 21300000, guid: 14e1ed894da01534d987ad589082ae51, type: 3}
+      StateImage: {fileID: 21300000, guid: d811d851d71cc1644b4800d82e0e3200, type: 3}
     - StateName: Shocked_1
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 21300000, guid: f222624e39ed6ea4eb994bce20b8e1c6, type: 3}
+      StateImage: {fileID: 21300000, guid: 9773fdf4f2a235e41b85612edab0af99, type: 3}
     - StateName: Scared_2
       stateType: 0
       BaseImage: {fileID: 0}
-      StateImage: {fileID: 21300000, guid: 5e7ece285dba3be419f893d01eddf17e, type: 3}
+      StateImage: {fileID: 21300000, guid: d3c15cdf302fd73459ad1d24296a9560, type: 3}
     CharacterPic: {fileID: 0}
     UseSeperateColors: 0
     Color:

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Utilities;
 
 public class CharacterManager : MonoBehaviour {
 	public GameObject CharacterArray = null;
@@ -38,7 +37,7 @@ public class CharacterManager : MonoBehaviour {
 		CharactersInScene.TryGetValue(Name, out CharacterData tempchar);
 
 		if (tempchar != null) {
-			Debug.LogError("Character is already in the scene.");
+			Debug.LogError("Character(" + Name + ") is already in the scene.");
 			return;
 		}
 

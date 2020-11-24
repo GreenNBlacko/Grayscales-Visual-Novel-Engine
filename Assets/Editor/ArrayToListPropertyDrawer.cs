@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEditor;
+#if UNITY_EDITOR
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(ArrayToListAttribute))]
@@ -75,3 +76,4 @@ public class ArrayToListPropertyDrawer : PropertyDrawer {
 		}
 	}
 }
+#endif

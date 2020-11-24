@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.IO;
 using UnityEngine;
 
@@ -103,7 +101,6 @@ public class sent {
 
 	public string Text;
 
-	[JsonConverter(typeof(StringEnumConverter))]
 	public Sentence.ArtworkType artworkType = Sentence.ArtworkType.None;
 
 	public int BG_ID;
@@ -124,7 +121,6 @@ public class sent {
 
 [Serializable]
 public class SentenceActionData {
-	[JsonConverter(typeof(StringEnumConverter))]
 	public OnSentenceInit.Actions ActionType;
 
 	public bool FadeIn;
@@ -162,7 +158,6 @@ public class CharData {
 	public string textColorHex;
 	public byte[] textColorRGB;
 
-	[JsonConverter(typeof(StringEnumConverter))]
 	public Character.GradientType gradientType = Character.GradientType.None;
 
 	public bool useSeperateGradientColors;

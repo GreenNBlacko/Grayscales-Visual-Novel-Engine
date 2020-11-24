@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(DrawIfAnyAttribute))]
@@ -54,3 +55,4 @@ public class DrawIfAnyPropertyDrawer : PropertyDrawer {
 		}
 	}
 }
+#endif

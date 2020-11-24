@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(OnSentenceInit))]
@@ -249,3 +250,4 @@ public class SentenceActionsPropertyDrawer : PropertyDrawer {
 		return propertyHeight;
 	}
 }
+#endif
