@@ -87,22 +87,47 @@ public class CharacterManager : MonoBehaviour {
 					break;
 				}
 			case CharacterState.StateType.MultiLayer: {
-					GameObject expressionLayer = new GameObject();
+					if (state.Advanced) {
+						GameObject expressionLayer = new GameObject();
 
-					expressionLayer.transform.SetParent(character.transform);
+						expressionLayer.transform.SetParent(character.transform);
 
-					expressionLayer.AddComponent<RectTransform>();
-					expressionLayer.AddComponent<Image>();
+						expressionLayer.AddComponent<RectTransform>();
+						expressionLayer.AddComponent<Image>();
 
-					baseLayer.GetComponent<Image>().sprite = state.BaseImage;
+						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
 
-					expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+						character.AddComponent<Image>();
+						character.GetComponent<Image>().sprite = state.BaseImage;
+						character.GetComponent<Image>().SetNativeSize();
 
-					expressionLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
-					expressionLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
-					expressionLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+						Destroy(character.GetComponent<Image>());
 
-					characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
+						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+
+						expressionLayer.GetComponent<Image>().SetNativeSize();
+
+						expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
+
+						characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
+					} else {
+						GameObject expressionLayer = new GameObject();
+
+						expressionLayer.transform.SetParent(character.transform);
+
+						expressionLayer.AddComponent<RectTransform>();
+						expressionLayer.AddComponent<Image>();
+
+						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
+
+						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+
+						expressionLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
+						expressionLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
+						expressionLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+
+						characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
+					}
 					break;
 				}
 		}
@@ -130,7 +155,7 @@ public class CharacterManager : MonoBehaviour {
 		Character temp = new Character();
 
 		foreach (Character character in characterInfo.Characters) {
-			if(character.CharacterName != Name) { continue; }
+			if (character.CharacterName != Name) { continue; }
 			foreach (CharacterState characterState in character.CharacterStates) {
 				if (characterState == state) {
 					return character;
@@ -284,12 +309,13 @@ public class CharacterManager : MonoBehaviour {
 
 			if (TempLerpData.TryGetValue(character.characterGO.name, out Vector2 tempPos))
 				TempLerpData[character.characterGO.name] = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
-			
+
 
 			timeElapsed += Time.deltaTime;
 
 			yield return null;
 		}
+		character.characterGO.transform.GetComponent<RectTransform>().position = Pos;
 		enumerators.Remove(character.characterGO.name);
 		TempLerpData.Remove(character.characterGO.name);
 	}
@@ -374,17 +400,44 @@ public class CharacterManager : MonoBehaviour {
 						character.BaseLayer.color = new Color32(255, 255, 255, 0);
 
 						GameObject expressionlayer = character.ExpressionLayer.gameObject;
+						GameObject expressionLayer;
 
-						GameObject expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
+						if (state.Advanced) {
+							expressionLayer = new GameObject();
 
-						expressionLayer.transform.SetParent(character.characterGO.transform);
+							expressionLayer.transform.SetParent(character.characterGO.transform);
 
-						expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
-						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+							expressionLayer.AddComponent<RectTransform>();
+							expressionLayer.AddComponent<Image>();
 
-						character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+							baseLayer.GetComponent<Image>().sprite = state.BaseImage;
 
-						character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+							character.characterGO.AddComponent<Image>();
+							character.characterGO.GetComponent<Image>().sprite = state.BaseImage;
+							character.characterGO.GetComponent<Image>().SetNativeSize();
+
+							Destroy(character.characterGO.GetComponent<Image>());
+
+							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+
+							expressionLayer.GetComponent<Image>().SetNativeSize();
+
+							expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
+
+							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+						} else { 
+							expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
+
+							expressionLayer.transform.SetParent(character.characterGO.transform);
+
+							expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
+							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+
+							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+
+							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+						}
 
 
 						while (timeElapsed < lerpDuration) {
@@ -437,15 +490,42 @@ public class CharacterManager : MonoBehaviour {
 					if (character.ExpressionLayer.sprite != state.StateImage) {
 						float timeElapsed = 0;
 						GameObject expressionlayer = character.ExpressionLayer.gameObject;
+						GameObject expressionLayer;
 
-						GameObject expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
+						if (state.Advanced) {
+							expressionLayer = new GameObject();
 
-						expressionLayer.transform.SetParent(character.characterGO.transform);
+							expressionLayer.transform.SetParent(character.characterGO.transform);
 
-						expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
-						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+							expressionLayer.AddComponent<RectTransform>();
+							expressionLayer.AddComponent<Image>();
 
-						character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+							character.characterGO.AddComponent<Image>();
+							character.characterGO.GetComponent<Image>().sprite = state.BaseImage;
+							character.characterGO.GetComponent<Image>().SetNativeSize();
+
+							Destroy(character.characterGO.GetComponent<Image>());
+
+							expressionLayer.GetComponent<RectTransform>().localScale = Vector3.one;
+
+							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
+
+							expressionLayer.GetComponent<Image>().SetNativeSize();
+
+							expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
+
+							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+						} else {
+							expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
+
+							expressionLayer.transform.SetParent(character.characterGO.transform);
+
+							expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
+							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
+
+							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
+						}
 
 						character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
 

@@ -77,6 +77,10 @@ public class CharacterState {
     [DrawIf("stateType", StateType.MultiLayer)]
     public Sprite BaseImage;
     public Sprite StateImage;
+    [DrawIf("stateType", StateType.MultiLayer)]
+    public bool Advanced;
+    [DrawIf("Advanced", true)]
+    public Vector2 EpressionLayerPosition;
 
     public enum StateType { SingleLayer, MultiLayer };
 }
