@@ -1,9 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-public class MenuManager : MonoBehaviour
-{
-    public RectTransform[] MenuGameObjects;
+public class MenuManager : MonoBehaviour {
+    public GameObject[] MenuGameObjects;
+
+    public GameObject[] SaveLoadMenuLists;
 
     public SavingAndLoading savingAndLoadingOptions;
 
@@ -18,6 +19,13 @@ public class MenuManager : MonoBehaviour
     {
         
     }
+
+    public void LoadMenu(int index) {
+        foreach (GameObject menu in MenuGameObjects) {
+            menu.SetActive(false);
+        }
+        MenuGameObjects[index].SetActive(true);
+	} 
 }
 
 [Serializable]

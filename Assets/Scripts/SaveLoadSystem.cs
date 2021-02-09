@@ -33,6 +33,8 @@ public class SaveLoadSystem : MonoBehaviour {
 		for (int i = 0; i < SavedataList.Length; i++) {
 			Load(i);
 		}
+
+		Debug.Log(DateTime.Now.ToString("yyyy/MM/dd HH:mm"));
 	}
 
 	void Update() {
@@ -110,7 +112,7 @@ public class SaveLoadSystem : MonoBehaviour {
 		SavedataList[slot].ChapterID = dialogueManager.scripts.ChapterManagerScript.CurrentChapterIndex;
 		SavedataList[slot].characters = GetCharacters();
 
-		foreach(CharacterSaveData character in SavedataList[slot].characters) {
+		foreach (CharacterSaveData character in SavedataList[slot].characters) {
 			character.CharacterPosition[0] /= Screen.width;
 			character.CharacterPosition[1] /= Screen.height;
 
@@ -119,6 +121,8 @@ public class SaveLoadSystem : MonoBehaviour {
 		}
 
 		AddChoiceData(dialogueManager.Returnbacklog(), slot);
+
+		SavedataList[slot].SaveDate = DateTime.Now.ToString("yyyy/MM/dd/HH:mm");
 
 		BinaryFormatter bf = new BinaryFormatter();
 		FileStream file = File.Create(Application.persistentDataPath + "/Save_" + slot + ".sav");
@@ -190,14 +194,14 @@ public class SaveLoadSystem : MonoBehaviour {
 	}
 
 	public void ManageCharacterInfo(List<CharacterSaveData> characters) {
-		foreach(Character character in FindObjectOfType<CharacterInfo>().Characters) {
-			if(character.CharacterOnScene) {
+		foreach (Character character in FindObjectOfType<CharacterInfo>().Characters) {
+			if (character.CharacterOnScene) {
 				FindObjectOfType<CharacterManager>().RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition);
 			}
 		}
 
-		foreach(CharacterSaveData character in characters) {
-			if(character.CharacterOnScene) {
+		foreach (CharacterSaveData character in characters) {
+			if (character.CharacterOnScene) {
 				FindObjectOfType<CharacterManager>().AddCharacterToScene(character.CharacterName, dialogueManager.GetCharacterState(character.CharacterName, character.stateName), new Vector2(character.CharacterPosition[0], character.CharacterPosition[1]));
 			}
 		}
@@ -207,8 +211,8 @@ public class SaveLoadSystem : MonoBehaviour {
 		List<CharacterSaveData> saveDatas = new List<CharacterSaveData>();
 		List<Character> characters = FindObjectOfType<CharacterInfo>().Characters.ToList();
 
-		foreach(Character character in characters) {
-			saveDatas.Add(new CharacterSaveData() { CharacterName = character.CharacterName, CharacterOnScene = character.CharacterOnScene, CharacterPosition = new float[2] { character.CharacterPosition.x / character.CharacterScale.x, character.CharacterPosition.y / character.CharacterScale.y }, stateName = character.CurrentState.StateName});
+		foreach (Character character in characters) {
+			saveDatas.Add(new CharacterSaveData() { CharacterName = character.CharacterName, CharacterOnScene = character.CharacterOnScene, CharacterPosition = new float[2] { character.CharacterPosition.x / character.CharacterScale.x, character.CharacterPosition.y / character.CharacterScale.y }, stateName = character.CurrentState.StateName });
 		}
 
 		return saveDatas;
@@ -220,6 +224,7 @@ public class SaveData {
 	public int SentenceID;
 	public int ChapterID;
 	public byte[] ImageSave;
+	public string SaveDate;
 	public List<BacklogEntry> Choices = new List<BacklogEntry>();
 	[SerializeField]
 	public List<CharacterSaveData> characters = new List<CharacterSaveData>();

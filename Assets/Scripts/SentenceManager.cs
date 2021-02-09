@@ -8,11 +8,17 @@ public class SentenceManager : MonoBehaviour {
 	public bool UseJSONFile;
 
 	[HideInInspector]
+	public bool Translating;
+
+	[HideInInspector]
 	public bool OverrideSentenceValues;
 
 	public Chapter[] Chapters;
 
 	public void Start() {
+		if(Translating) {
+			return;
+		}
 
 		DialogueManager scriptmanager = (DialogueManager)FindObjectOfType(typeof(DialogueManager));
 		scriptmanager.scripts.sentenceManager = this;
@@ -23,12 +29,21 @@ public class SentenceManager : MonoBehaviour {
 		JSONSentenceImporter JsonSentenceImporter = (JSONSentenceImporter)FindObjectOfType(typeof(JSONSentenceImporter));
 		CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
 
+		SentenceTools.sentenceManager = this;
+		SentenceTools.characterInfo = characterInfo;
+
 		JsonSentenceImporter.LoadFromJSON();
 	}
 
 	public void ImportSentenceDataCS () {
-		SentenceTools.AddChapter(this, "ChapterName");
-		SentenceTools.AddSentence(this, "ChapterName", "Test Character 3", "Testing if choice options are working", Sentence.ArtworkType.None);
+		CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
+
+		SentenceTools.sentenceManager = this;
+		SentenceTools.characterInfo = characterInfo;
+
+		//SentenceTools.AddChapter("ChapterName");
+		//SentenceTools.AddSentence("ChapterName", "Test Character 3", "Testing if choice options are working", Sentence.ArtworkType.None);
+		SentenceTools.AddCharacterState("Test Character 2", "state", CharacterState.StateType.SingleLayer, "mashs_0.png");
 	}
 }
 
@@ -43,6 +58,7 @@ public class Chapter {
 
 	public Sentence[] Sentences;
 
+	public List<List<CharacterSaveData>> characterSaves = new List<List<CharacterSaveData>>();
 }  
 
 [Serializable]
@@ -52,6 +68,11 @@ public class Sentence {
 	[Tooltip("Character's name")]
 	[ArrayToList("GetCharacterNames")]
 	public string Name;
+
+	public bool OverrideName;
+
+	[ConditionalHide("OverrideName", true)]
+	public string DisplayName;
 
 	[Tooltip("Character's sentence")]
 	[TextArea]

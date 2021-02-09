@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 
 public class DialogueManager : MonoBehaviour {
+
 	public GameObjects gameObjects;
 
 	public ButtonArrays buttonArrays;
@@ -20,6 +21,8 @@ public class DialogueManager : MonoBehaviour {
 	public int BacklogID = 0;
 
 	private bool ShowTextRun = false;
+
+	private bool ignoreSentenceActions;
 
 	[HideInInspector]
 	public bool choiceNext = false;
@@ -45,6 +48,8 @@ public class DialogueManager : MonoBehaviour {
 		gameObjects.BacklogGameobject.SetActive(false);
 		gameObjects.ChoiceList.SetActive(false);
 		choiceNext = false;
+
+		CalculateCharacterData();
 	}
 
 	void Update() {
@@ -111,13 +116,10 @@ public class DialogueManager : MonoBehaviour {
 	}
 
 	public void NextSentence() {
-		StopCoroutine(ShowText(BacklogID));
 		if (!ShowTextRun) {
 			if (BacklogID != scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences.Length || scripts.ChapterManagerScript.CurrentChapterIndex != scripts.sentenceManager.Chapters.Length - 1 && choiceNext == true) {
 				if (!choiceNext) {
 					Sentence sentence = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID];
-
-
 
 					foreach (Character character in scripts.CharacterInfoScript.Characters) {
 						if (character.CharacterName == sentence.Name)
@@ -133,7 +135,7 @@ public class DialogueManager : MonoBehaviour {
 					UpdateColor(currentCharacter);
 
 					if (textBox.TypeText) {
-						StartCoroutine(ShowText(BacklogID));
+						StartCoroutine(ShowText(sentence.Text));
 						ShowTextRun = true;
 					} else {
 						textBox.SentenceText.text = sentence.Text;
@@ -156,7 +158,11 @@ public class DialogueManager : MonoBehaviour {
 						Debug.Log("Choice detected");
 					}
 
-					StartCoroutine(CallOnSentenceInit(sentence));
+					if(!ignoreSentenceActions) {
+						StartCoroutine(CallOnSentenceInit(sentence));
+					}
+
+					ignoreSentenceActions = false;
 
 					AddItemToBacklog(BacklogID, scripts.ChapterManagerScript.CurrentChapterIndex, sentence.Name, sentence.Text, currentCharacter, sentence.Voiced, sentence.VoiceClip);
 					BacklogID += 1;
@@ -171,13 +177,37 @@ public class DialogueManager : MonoBehaviour {
 				}
 			} else {
 				Chapter chapter = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex];
-				if (chapter.NextChapter != -1)
-					scripts.ChapterManagerScript.LoadChapter(chapter.NextChapter);
-				else
+				int nextChapterIndex = chapter.NextChapter;
+
+				if(scripts.sentenceManager.Chapters.Length <= nextChapterIndex) {
+					nextChapterIndex = -1;
+				}
+
+				if (nextChapterIndex != -1) {
+					if (buttonArrays.ChapterJumpArray != null) {
+						if (buttonArrays.ChapterJumpArray.childCount != 0) {
+							buttonArrays.ChapterJumpArray.GetChild(buttonArrays.ChapterJumpArray.childCount - 1).GetComponent<ChapterJumpItem>().IsCurrentChapter = false;
+						}
+
+						Chapter nextChapter = scripts.sentenceManager.Chapters[nextChapterIndex];
+
+						GameObject chapterJump = Instantiate(buttonPrefabs.ChapterJumpItemPreset, buttonArrays.ChapterJumpArray);
+						chapterJump.name = nextChapter.ChapterName;
+
+						ChapterJumpItem item = chapterJump.GetComponent<ChapterJumpItem>();
+
+						item.ChapterName = nextChapter.ChapterName;
+						item.ChapterIndex = chapter.NextChapter;
+						item.IsCurrentChapter = true;
+					}
+
+					scripts.ChapterManagerScript.LoadChapter(nextChapterIndex);
+				} else
 					Debug.Log("End of sentences.");
 			}
 		} else {
 			Sentence sentence = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID - 1];
+			StopCoroutine(ShowText(sentence.Text));
 			textBox.SentenceText.maxVisibleCharacters = sentence.Text.Length;
 			ShowTextRun = false;
 		}
@@ -278,15 +308,16 @@ public class DialogueManager : MonoBehaviour {
 
 	}
 
-	public IEnumerator ShowText(int ID) {
+	public IEnumerator ShowText(string text) {
 		textBox.SentenceText.maxVisibleCharacters = 1;
-		textBox.SentenceText.text = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[ID].Text;
+		textBox.SentenceText.text = text;
 		yield return new WaitForSeconds(textBox.TextSpeed);
 
-		for (int i = 1; i < scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[ID].Text.Length; i++) {
+		for (int i = 1; i < text.Length; i++) {
 			textBox.SentenceText.maxVisibleCharacters += 1;
 			yield return new WaitForSeconds(textBox.TextSpeed);
 		}
+
 		ShowTextRun = false;
 	}
 
@@ -306,6 +337,17 @@ public class DialogueManager : MonoBehaviour {
 	}
 
 	public void JumpTo(int ID, int chapterIndex) {
+		scripts.characterManagerScript.RemoveAllCharactersFromScene();
+
+		foreach(CharacterSaveData data in scripts.sentenceManager.Chapters[chapterIndex].characterSaves[ID]) {
+			if(data.CharacterOnScene && !scripts.characterManagerScript.CharacterInScene(data.CharacterName)) {
+				scripts.characterManagerScript.AddCharacterToScene(data.CharacterName, GetCharacterState(data.CharacterName, data.stateName), new Vector2(data.CharacterPosition[0], data.CharacterPosition[1]));
+				Debug.Log(data.CharacterName + " added");
+			}
+		}
+
+		ignoreSentenceActions = true;
+
 		if (chapterIndex == scripts.ChapterManagerScript.CurrentChapterIndex) {
 			BacklogID = ID;
 			for (int i = ID; i < GetChildCountInArray(buttonArrays.BacklogButtonsArray); i++) {
@@ -316,6 +358,7 @@ public class DialogueManager : MonoBehaviour {
 
 			gameObjects.BacklogGameobject.SetActive(false);
 			gameObjects.ChoiceList.SetActive(false);
+
 			if (choiceNext) {
 				foreach (Transform choiceButton in buttonArrays.ChoiceButtonsArray) {
 					choiceButton.GetComponent<ChoiceListItem>().Remove();
@@ -408,6 +451,85 @@ public class DialogueManager : MonoBehaviour {
 				}
 		}
 	}
+
+	public void CalculateCharacterData() {
+		Chapter nextChapter = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex];
+
+		GameObject chapterJump = Instantiate(buttonPrefabs.ChapterJumpItemPreset, buttonArrays.ChapterJumpArray);
+		chapterJump.name = nextChapter.ChapterName;
+
+		ChapterJumpItem item = chapterJump.GetComponent<ChapterJumpItem>();
+
+		item.ChapterName = nextChapter.ChapterName;
+		item.ChapterIndex = scripts.ChapterManagerScript.CurrentChapterIndex;
+		item.IsCurrentChapter = true;
+
+		List<List<CharacterSaveData>> characterData = new List<List<CharacterSaveData>>();
+
+		List<CharacterSaveData> chapterData = new List<CharacterSaveData>();
+
+		foreach (Chapter chapter in scripts.sentenceManager.Chapters) {
+
+			if (characterData.Count > 0) {
+				chapterData = characterData[characterData.Count - 1];
+			}
+
+			Debug.Log(chapter.ChapterName);
+
+			foreach (Sentence sentence in chapter.Sentences) {
+
+				foreach (Character character in scripts.CharacterInfoScript.Characters) {
+					CharacterSaveData characterSaveData = new CharacterSaveData();
+
+					foreach (CharacterSaveData data in chapterData) {
+						if (data.CharacterName == character.CharacterName) {
+							characterSaveData = data;
+						}
+					}
+
+					characterSaveData.CharacterName = character.CharacterName;
+
+
+					foreach (OnSentenceInit sentenceInit in sentence.onSentenceInit) {
+						if (sentenceInit.CharacterName == characterSaveData.CharacterName) {
+							switch (sentenceInit.actionType) {
+								case OnSentenceInit.Actions.AddCharacterToScene: {
+										characterSaveData.CharacterOnScene = true;
+										characterSaveData.CharacterPosition = new float[2] { sentenceInit.Position.x, sentenceInit.Position.y };
+										characterSaveData.stateName = sentenceInit.CharacterState;
+										break;
+									}
+								case OnSentenceInit.Actions.MoveCharacter: {
+										characterSaveData.CharacterOnScene = true;
+										characterSaveData.CharacterPosition = new float[2] { sentenceInit.Position.x, sentenceInit.Position.y };
+										break;
+									}
+								case OnSentenceInit.Actions.ChangeCharacterState: {
+										characterSaveData.CharacterOnScene = true;
+										characterSaveData.stateName = sentenceInit.CharacterState;
+										break;
+									}
+								case OnSentenceInit.Actions.RemoveCharacterFromScene: {
+										characterSaveData.CharacterOnScene = false;
+										break;
+									}
+							}
+						}
+					}
+					chapterData.Add(characterSaveData);
+
+					string nostate = "None";
+					string state = (characterSaveData.stateName != null) ? characterSaveData.stateName : nostate;
+
+					Debug.Log("Name: " + characterSaveData.CharacterName + ", On scene: " + characterSaveData.CharacterOnScene + ", Position: X" + characterSaveData.CharacterPosition[0] + ", Y" + characterSaveData.CharacterPosition[1] + ", State: " + state);
+				}
+			}
+
+			characterData.Add(chapterData);
+
+			chapter.characterSaves = characterData;
+		}
+	}
 }
 
 [System.Serializable]
@@ -422,12 +544,14 @@ public class GameObjects {
 public class ButtonArrays {
 	public Transform BacklogButtonsArray;
 	public Transform ChoiceButtonsArray;
+	public Transform ChapterJumpArray;
 }
 
 [System.Serializable]
 public class ButtonPrefabs {
 	public GameObject BacklogButtonPreset;
 	public GameObject ChoiceButtonPreset;
+	public GameObject ChapterJumpItemPreset;
 }
 
 [System.Serializable]

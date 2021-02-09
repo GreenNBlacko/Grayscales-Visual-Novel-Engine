@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public static class SentenceTools {
-	public static void AddChapter(SentenceManager sentenceManager, string ChapterName, int NextChapter = -1)
+	public static SentenceManager sentenceManager;
+	public static CharacterInfo characterInfo;
+
+	public static void AddChapter(string ChapterName, int NextChapter = -1)
 	{
 		foreach (Chapter chap in sentenceManager.Chapters)
 		{
 			if (chap.ChapterName == ChapterName)
 			{
-				EditChapter(sentenceManager, ChapterName, ChapterName, NextChapter);
+				EditChapter(ChapterName, ChapterName, NextChapter);
 				return;
 			}
 		}
@@ -25,7 +29,7 @@ public static class SentenceTools {
 		sentenceManager.Chapters[i].Sentences = new Sentence[0];
 	}
 
-	public static void EditChapter(SentenceManager sentenceManager, string ChapterName, string ChapterNameNew = "", int NextChapter = -1) {
+	public static void EditChapter(string ChapterName, string ChapterNameNew = "", int NextChapter = -1) {
 		int ChapterIndex = 0;
 		foreach (Chapter chap in sentenceManager.Chapters)
 		{
@@ -40,7 +44,7 @@ public static class SentenceTools {
 		sentenceManager.Chapters[ChapterIndex].NextChapter = NextChapter;
 	}
 
-	public static void AddSentence(SentenceManager sentenceManager, string ChapterName, string Name, string Sentence, Sentence.ArtworkType artworkType = Sentence.ArtworkType.None, int BG_ID = -1, int CG_ID = -1, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
+	public static void AddSentence(string ChapterName, string Name, string Sentence, Sentence.ArtworkType artworkType = Sentence.ArtworkType.None, int BG_ID = -1, int CG_ID = -1, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
 		int ChapterIndex = -1;
 		foreach (Chapter chap in sentenceManager.Chapters) {
 			if (chap.ChapterName == ChapterName) {
@@ -54,7 +58,7 @@ public static class SentenceTools {
 		if(sentenceManager.OverrideSentenceValues) {
 			foreach (Sentence sent in sentenceManager.Chapters[ChapterIndex].Sentences) {
 				if (sent.Name == Name && sent.Text == Sentence) {
-					EditSentence(sentenceManager, ChapterName, Name, Sentence, Name, Sentence, artworkType, BG_ID, CG_ID, Choice, choiceOptions, Voiced, VoiceClip);
+					EditSentence(ChapterName, Name, Sentence, Name, Sentence, artworkType, BG_ID, CG_ID, Choice, choiceOptions, Voiced, VoiceClip);
 					return;
 				}
 			}
@@ -84,7 +88,7 @@ public static class SentenceTools {
 		}
 	}
 
-	public static void EditSentence(SentenceManager sentenceManager, string ChapterName, string SentenceName, string SentenceText, string Name = "", string Text = "", Sentence.ArtworkType artworkType = Sentence.ArtworkType.None, int BG_ID = -1, int CG_ID = -1, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
+	public static void EditSentence(string ChapterName, string SentenceName, string SentenceText, string Name = "", string Text = "", Sentence.ArtworkType artworkType = Sentence.ArtworkType.None, int BG_ID = -1, int CG_ID = -1, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
 		int ChapterIndex = -1;
 		foreach (Chapter chap in sentenceManager.Chapters) {
 			if (chap.ChapterName == ChapterName) {
@@ -146,7 +150,7 @@ public static class SentenceTools {
 		return new Color32(r, g, b, a);
 	}
 
-	public static void AddCharacter(CharacterInfo characterInfo, string characterName, Color32 nameColor = default, Color32 textColor = default, Character.GradientType gradientType = Character.GradientType.Name, Color32 nameColorGradient = default, Color32 textColorGradient = default, Color32 colorGradient = default) {
+	public static void AddCharacter(string characterName, Color32 nameColor = default, Color32 textColor = default, Character.GradientType gradientType = Character.GradientType.Name, Color32 nameColorGradient = default, Color32 textColorGradient = default, Color32 colorGradient = default) {
 		if (nameColor.a < 255)
 			nameColor = new Color32(255, 255, 255, 255);
 
@@ -173,6 +177,25 @@ public static class SentenceTools {
 		characterInfo.Characters[index].TextGradientColor = textColorGradient;
 	}
 
+	public static void AddCharacterState(string characterName, string stateName, CharacterState.StateType stateType = CharacterState.StateType.SingleLayer, string BaseImagePath = "") {
+		AddCharacterState(characterName, stateName, stateType, BaseImagePath, "" , false, Vector2.zero);
+	}
+
+	public static void AddCharacterState(string characterName, string stateName, CharacterState.StateType stateType, string BaseImagePath, string stateImagePath, bool advanced, Vector2 offset) {
+		foreach(Character character in characterInfo.Characters) {
+			if (character.CharacterName == characterName) {
+				int index = character.CharacterStates.Length;
+				Array.Resize(ref character.CharacterStates, index + 1);
+
+				Sprite baseImage = GetStateSprite(characterName, BaseImagePath), expressionImage = default;
+
+				if(stateImagePath != "") { expressionImage = GetStateSprite(characterName, stateImagePath); }
+
+				character.CharacterStates[index] = new CharacterState(stateName, stateType, baseImage, expressionImage, advanced, offset);
+			}
+		}
+	}
+
 	public static string[] GetCharacterNames () {
 		CharacterInfo characterInfo = GameObject.Find("ScriptManager").GetComponent<CharacterInfo>();
 		string[] list = new string[0];
@@ -195,5 +218,28 @@ public static class SentenceTools {
 			}
 		}
 		return list;
+	}
+
+	public static Sprite GetStateSprite(string characterName, string spriteName) {
+		Sprite sprite = Sprite.Create(new Texture2D(0, 0), new Rect(), Vector2.zero);
+
+		if(PathExists(Application.dataPath + "/Sprites/Characters/" + characterName + "/" + spriteName)) {
+			byte[] fileData = File.ReadAllBytes(Application.dataPath + "/Sprites/Characters/" + characterName + "/" + spriteName);
+			Texture2D tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
+			tex.LoadImage(fileData);
+
+			tex.Apply();
+
+			sprite = Sprite.Create(tex, new Rect(Vector2.zero, new Vector2(tex.width, tex.height)), Vector2.zero);
+			sprite.name = spriteName;
+		} else {
+			Debug.LogError("Path " + Application.dataPath + "/Sprites/Characters/" + characterName + "/" + spriteName + " doesn't exist!");
+		}
+
+		return sprite;
+	}
+
+	public static bool PathExists(string path) {
+		return File.Exists(path);
 	}
 }

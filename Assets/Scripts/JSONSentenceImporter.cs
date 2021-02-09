@@ -16,10 +16,12 @@ public class JSONSentenceImporter : MonoBehaviour {
 
 			SentenceManager sentenceManager = (SentenceManager)FindObjectOfType(typeof(SentenceManager));
 
+			SentenceTools.sentenceManager = sentenceManager;
+
 			foreach (chap ch in sentenceData.chapters) {
-				SentenceTools.AddChapter(sentenceManager, ch.ChapterName, ch.NextChapter);
+				SentenceTools.AddChapter(ch.ChapterName, ch.NextChapter);
 				foreach (sent sen in ch.sentences) {
-					SentenceTools.AddSentence(sentenceManager, ch.ChapterName, sen.Name, sen.Text, sen.artworkType, sen.BG_ID, sen.CG_ID, sen.Choice, sen.choiceOptions, sen.Voiced, sen.VoiceClip);
+					SentenceTools.AddSentence(ch.ChapterName, sen.Name, sen.Text, sen.artworkType, sen.BG_ID, sen.CG_ID, sen.Choice, sen.choiceOptions, sen.Voiced, sen.VoiceClip);
 				}
 			}
 			#endregion
@@ -27,6 +29,8 @@ public class JSONSentenceImporter : MonoBehaviour {
 			#region CharacterDataImport
 
 			CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
+
+			SentenceTools.characterInfo = characterInfo;
 
 			foreach (CharData charData in sentenceData.characterData) {
 				Color32 NameColor = default;
@@ -60,7 +64,7 @@ public class JSONSentenceImporter : MonoBehaviour {
 				if (charData.colorGradientHex != "")
 					ColorGradient = SentenceTools.HexToColor32(charData.colorGradientHex);
 
-				SentenceTools.AddCharacter(characterInfo, charData.characterName, NameColor, TextColor, charData.gradientType, NameColorGradient, TextColorGradient, ColorGradient);
+				SentenceTools.AddCharacter(charData.characterName, NameColor, TextColor, charData.gradientType, NameColorGradient, TextColorGradient, ColorGradient);
 			}
 			#endregion
 		} else {

@@ -7,14 +7,16 @@ public class SentenceActionsPropertyDrawer : PropertyDrawer {
 	int ActiveElements = 0;
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+		var ActionType = property.FindPropertyRelative("actionType");
+
+		label.text = "Action(" + ActionType.enumDisplayNames[ActionType.enumValueIndex] + ")";
+
 		EditorGUI.BeginProperty(position, label, property);
 
 		Rect contentPosition = EditorGUI.PrefixLabel(position, label);
 		ActiveElements = 1;
 
 		var ActionTypeRect = new Rect(position.x, position.y + 18 * ActiveElements, position.width, 16);
-
-		var ActionType = property.FindPropertyRelative("actionType");
 
 		EditorGUI.indentLevel++;
 
@@ -195,7 +197,7 @@ public class SentenceActionsPropertyDrawer : PropertyDrawer {
 
 		EditorGUI.EndProperty();
 	}
-
+	
 	public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
 		float propertyHeight = 36;
 

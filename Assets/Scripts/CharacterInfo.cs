@@ -83,4 +83,21 @@ public class CharacterState {
     public Vector2 EpressionLayerPosition;
 
     public enum StateType { SingleLayer, MultiLayer };
+
+    public CharacterState() {}
+
+    public CharacterState(string stateName, StateType type, Sprite baseImage, Sprite stateImage = default, bool advanced = false, Vector2 expressionLayerPosition = default) {
+        StateName = stateName;
+        stateType = type;
+        if(type == StateType.SingleLayer) {
+            StateImage = baseImage;
+		} else {
+            BaseImage = baseImage;
+            StateImage = stateImage;
+            Advanced = advanced;
+            if (advanced) {
+                EpressionLayerPosition = expressionLayerPosition;
+            }
+        }
+	}
 }

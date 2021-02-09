@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -94,7 +94,7 @@
     <Compile Include="E:\Gamedev stuff\Unity Engine\2020.1.2f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Editor\UI\PropertyDrawers\ColorBlockDrawer.cs" />
   </ItemGroup>
   <ItemGroup>
-     <None Include="E:\Gamedev stuff\Unity Engine\2020.1.2f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Editor\UnityEditor.UI.asmdef" />
+    <None Include="E:\Gamedev stuff\Unity Engine\2020.1.2f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Editor\UnityEditor.UI.asmdef" />
     <Reference Include="UnityEngine">
       <HintPath>E:\Gamedev stuff\Unity Engine\2020.1.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

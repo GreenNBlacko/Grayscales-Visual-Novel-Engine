@@ -97,7 +97,6 @@ public class CharacterManager : MonoBehaviour {
 
 						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
 
-						character.AddComponent<Image>();
 						character.GetComponent<Image>().sprite = state.BaseImage;
 						character.GetComponent<Image>().SetNativeSize();
 
@@ -281,6 +280,20 @@ public class CharacterManager : MonoBehaviour {
 		}
 		resolution.x = Screen.width;
 		resolution.y = Screen.height;
+	}
+
+	public void RemoveAllCharactersFromScene() {
+		StopAllCoroutines();
+		foreach(Character character in characterInfo.Characters) {
+			if(character.CharacterOnScene) {
+				RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition);
+				Debug.Log(character.CharacterName);
+			}
+		}
+	}
+
+	public bool CharacterInScene(string name) {
+		return CharactersInScene.TryGetValue(name, out CharacterData data);
 	}
 
 	public Vector2 GetPosition(Vector2 position, bool OverrideValues = false) {

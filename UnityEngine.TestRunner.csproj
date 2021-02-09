@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -165,7 +165,7 @@
     <Compile Include="Library\PackageCache\com.unity.test-framework@1.1.16\UnityEngine.TestRunner\Utils\AttributeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-     <None Include="Library\PackageCache\com.unity.test-framework@1.1.16\UnityEngine.TestRunner\UnityEngine.TestRunner.asmdef" />
+    <None Include="Library\PackageCache\com.unity.test-framework@1.1.16\UnityEngine.TestRunner\UnityEngine.TestRunner.asmdef" />
     <Reference Include="UnityEngine">
       <HintPath>E:\Gamedev stuff\Unity Engine\2020.1.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

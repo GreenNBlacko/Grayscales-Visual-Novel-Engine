@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -62,6 +62,37 @@
     <Compile Include="Assets\Editor\ConditionalHidePropertyDrawer.cs" />
     <Compile Include="Assets\Editor\SentenceManagerCustomEditor.cs" />
     <Compile Include="Assets\Editor\DrawIfAnyPropertyDrawer.cs" />
+    <Compile Include="Assets\Editor\TranslateMenu.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\ComponentExtensionMethods.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\CubismAssetProcessor.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\CubismExpressionAssetDeleter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismLookControllerInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\CubismImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\CubismFadeAssetDeleter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismRenderControllerInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\CubismImporterBase.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\CubismUnityEditorMenu.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\CubismUnityEditorUtility.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismPartsInspectorInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Plugins\Editor\CubismiOSPluginProcessor.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\ICubismDeleter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismMaskControllerInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\CubismAnimationClipDeleter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Framework\MotionFade\Editor\CubismFadeMotionImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\AssetGuid.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismParametersInspectorInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\ICubismImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\CubismDeleter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\CubismModel3JsonImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Deleters\CubismDeleterBase.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Samples\Editor\ImportCustomization.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismMaskTextureInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Importers\CubismMotion3JsonImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\CubismOriginalWorkflowSettings.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismUserDataTagInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Editor\Inspectors\CubismRendererInspector.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Framework\Expression\Editor\CubismExpression3JsonImporter.cs" />
+    <Compile Include="Assets\Live2D\Cubism\Framework\Pose\Editor\CubismPoseMotionImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -640,6 +671,9 @@
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
@@ -649,14 +683,31 @@
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{3271A3D1-29F8-D6DC-A3A2-4D9DABA3460D}</Project>
       <Name>Assembly-CSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniTask.Addressables.csproj">
+      <Project>{3E57F5EC-D8DD-84FB-7A54-279FB5E10587}</Project>
+      <Name>UniTask.Addressables</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniTask.csproj">
+      <Project>{7EA51B6D-4BAD-CDDD-5008-58DA08AF622A}</Project>
+      <Name>UniTask</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniTask.DOTween.csproj">
+      <Project>{99FE10B5-5D0E-8A0E-2A74-32178375BF9E}</Project>
+      <Name>UniTask.DOTween</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniTask.TextMeshPro.csproj">
+      <Project>{1A89E496-B02B-D60F-6359-675C0CFCDBFF}</Project>
+      <Name>UniTask.TextMeshPro</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniTask.Linq.csproj">
+      <Project>{631926E3-772E-A782-7D98-2EEE5B51B2FE}</Project>
+      <Name>UniTask.Linq</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
