@@ -55,23 +55,62 @@ public class ArrayToListPropertyDrawer : PropertyDrawer {
 
 		string[] stringArray = new string[0];
 
+		if (ArrayToList.MethodName == "GetChapterNames")
+			stringArray = SentenceTools.GetChapterNames();
+
 		if(ArrayToList.MethodName == "GetCharacterNames")
 			stringArray = SentenceTools.GetCharacterNames();
-		if(ArrayToList.MethodName == "GetCharacterStates") {
-			string path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, ArrayToList.AdditionalVariables) : ArrayToList.AdditionalVariables;
 
-			comparedField = property.serializedObject.FindProperty(path);
-			stringArray = SentenceTools.GetCharacterStates(comparedField.stringValue);
+		if(ArrayToList.MethodName == "GetCharacterVariants") {
+			string path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, ArrayToList.AdditionalVariable) : ArrayToList.AdditionalVariable;
+
+			SerializedProperty AdditionalProperty;
+
+			AdditionalProperty = property.serializedObject.FindProperty(path);
+			stringArray = SentenceTools.GetCharacterVariants(AdditionalProperty.stringValue);
 		}
 
-		if(ShowMe(property)) {
-			if (stringArray.Length > 0) {
-				int index = Mathf.Max(0, Array.IndexOf(stringArray, property.stringValue));
-				index = EditorGUI.Popup(position, property.displayName, index, stringArray);
+		if (ArrayToList.MethodName == "GetCharacterStates") {
+			string path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, ArrayToList.AdditionalVariable) : ArrayToList.AdditionalVariable;
 
-				property.stringValue = stringArray[index];
+			SerializedProperty AdditionalProperty = property.serializedObject.FindProperty(path);
+
+			path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, ArrayToList.SecondAdditionalVariable) : ArrayToList.SecondAdditionalVariable;
+
+			SerializedProperty SecondAdditionalProperty = property.serializedObject.FindProperty(path);
+
+			stringArray = SentenceTools.GetCharacterStates(AdditionalProperty.stringValue, SecondAdditionalProperty.stringValue);
+		}
+
+		if (ArrayToList.MethodName == "GetBGList")
+			stringArray = SentenceTools.GetBGList();
+
+		if (ArrayToList.MethodName == "GetCGList")
+			stringArray = SentenceTools.GetCGList();
+
+		if (ShowMe(property)) {
+			if (stringArray.Length > 0) {
+				int index = 0;
+
+				if (property.type == "string") {
+					index = Mathf.Max(0, Array.IndexOf(stringArray, property.stringValue));
+					index = EditorGUI.Popup(position, property.displayName, index, stringArray);
+				} else {
+					index = property.intValue;
+					if (ArrayToList.MethodName == "GetChapterNames" || ArrayToList.MethodName == "GetBGList" || ArrayToList.MethodName == "GetCGList") index = EditorGUI.Popup(position, property.displayName, index + 1, stringArray) - 1;
+					else index = EditorGUI.Popup(position, property.displayName, index, stringArray);
+				}
+					
+
+				if(property.type == "string")
+					property.stringValue = stringArray[index];
+				else
+					property.intValue = index;
 			} else {
-				property.stringValue = EditorGUI.TextField(position, property.stringValue);
+				if (property.type == "string")
+					property.stringValue = EditorGUI.TextField(position, property.stringValue);
+				else
+					property.intValue = EditorGUI.IntField(position, property.intValue);
 			}
 		}
 	}

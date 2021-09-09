@@ -13,12 +13,13 @@ public class DrawIfAnyPropertyDrawer : PropertyDrawer {
 			return 0f;
 
 		// The height of the property should be defaulted to the default height.
+
 		return base.GetPropertyHeight(property, label);
 	}
 
 	private bool ShowMe(SerializedProperty property) {
 		drawIf = attribute as DrawIfAnyAttribute;
-		string path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, drawIf.comparedPropertyName) : drawIf.comparedPropertyName;
+		string path = property.propertyPath.Contains(".") ? System.IO.Path.ChangeExtension(property.propertyPath, drawIf.comparedPropertyName).Replace("choiceOptions.Array.", "") : drawIf.comparedPropertyName;
 		bool showMe = false;
 
 		comparedField = property.serializedObject.FindProperty(path);
@@ -50,9 +51,26 @@ public class DrawIfAnyPropertyDrawer : PropertyDrawer {
 			if (drawIf.slider) {
 				property.floatValue = EditorGUI.Slider(position, label, property.floatValue, 2, 0);
 			} else {
-				EditorGUI.PropertyField(position, property);
+				string path = System.IO.Path.ChangeExtension(property.propertyPath, drawIf.comparedPropertyName).Replace(".Array." + drawIf.comparedPropertyName, "");
+
+				SerializedProperty array = property.serializedObject.FindProperty(path);
+
+				Rect labelPosition = new Rect { x = position.x + 73, y = position.y, width = position.width, height = position.height };
+
+				EditorGUI.BeginProperty(position, label, array);
+
+				drawIf.IsActive = EditorGUI.BeginFoldoutHeaderGroup(labelPosition, drawIf.IsActive, label);
+				//var arraySizeFieldRect = 
+
+
+
+				EditorGUI.EndFoldoutHeaderGroup();
+
+				EditorGUI.EndProperty();
 			}
 		}
 	}
+
+
 }
 #endif

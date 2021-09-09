@@ -26,7 +26,7 @@ public class SaveLoadSystem : MonoBehaviour {
 	#endregion
 
 	void Start() {
-		if (File.Exists(Application.persistentDataPath + "/QuickSave.sav")) { loadButton.interactable = true; } else { loadButton.interactable = false; }
+		//if (File.Exists(Application.persistentDataPath + "/QuickSave.sav")) { loadButton.interactable = true; } else { loadButton.interactable = false; }
 		quickSaveData = new SaveData();
 		SavedataList = new SaveData[0];
 		QuickLoad();

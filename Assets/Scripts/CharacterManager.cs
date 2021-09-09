@@ -8,37 +8,24 @@ public class CharacterManager : MonoBehaviour {
 	public GameObject CharacterArray = null;
 	private Dictionary<string, CharacterData> CharactersInScene = new Dictionary<string, CharacterData>();
 	private CharacterInfo characterInfo = null;
-	private Vector2 resolution = new Vector2(Screen.width, Screen.height);
 	private Dictionary<string, Vector2> TempLerpData = new Dictionary<string, Vector2>();
 	private Dictionary<string, Coroutine> enumerators = new Dictionary<string, Coroutine>();
 
 	void Start() {
 		characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
-
-		resolution.x = Screen.width;
-		resolution.y = Screen.height;
 	}
 
-	private void LateUpdate() {
-
-		if (resolution.x != Screen.width || resolution.y != Screen.height) {
-			foreach (CharacterData character in CharactersInScene.Values) {
-				UpadteCharacterPosition(character.characterGO);
-			}
-		}
-	}
-
-	public void AddCharacterToScene(string Name, CharacterState state, Vector2 position, bool enterScene = false, Vector2 startingPosition = default, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
+	public IEnumerator AddCharacterToScene(string Name, CharacterState state, Vector2 position, bool enterScene = false, Vector2 startingPosition = default, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
 		if (CharacterArray == null) {
 			Debug.LogError("No Character array gameObject found.");
-			return;
+			yield break;
 		}
 
 		CharactersInScene.TryGetValue(Name, out CharacterData tempchar);
 
 		if (tempchar != null) {
 			Debug.LogError("Character(" + Name + ") is already in the scene.");
-			return;
+			yield break;
 		}
 
 		int index = 0;
@@ -139,15 +126,18 @@ public class CharacterManager : MonoBehaviour {
 
 		character.transform.SetParent(CharacterArray.transform);
 
-		if (enterScene) {
-			enumerators.Add(Name, StartCoroutine(Lerp(startingPosition, position, speed, characterData)));
-		} else {
-			character.transform.GetComponent<RectTransform>().position = position;
-		}
-
 		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacter(Name, state).CharacterScale.x, 1 * GetCharacter(Name, state).CharacterScale.y, 1);
 
 		CharactersInScene.Add(Name, characterData);
+
+		if (enterScene) {
+			Coroutine coroutine = StartCoroutine(Lerp(startingPosition, position, speed, characterData));
+			enumerators.Add(Name, coroutine);
+
+			yield return coroutine;
+		} else {
+			character.transform.GetComponent<RectTransform>().position = position;
+		}
 	}
 
 	public Character GetCharacter(string Name, CharacterState state) {
@@ -155,9 +145,11 @@ public class CharacterManager : MonoBehaviour {
 
 		foreach (Character character in characterInfo.Characters) {
 			if (character.CharacterName != Name) { continue; }
-			foreach (CharacterState characterState in character.CharacterStates) {
-				if (characterState == state) {
-					return character;
+			foreach(CharacterVariant variant in character.characterVariants) {
+				foreach (CharacterState characterState in variant.variantStates) {
+					if (characterState == state) {
+						return character;
+					}
 				}
 			}
 		}
@@ -165,12 +157,12 @@ public class CharacterManager : MonoBehaviour {
 		return temp;
 	}
 
-	public void MoveCharacter(string Name, Vector2 position, float speed) {
+	public IEnumerator MoveCharacter(string Name, Vector2 position, float speed) {
 		int index = 0;
 
 		if (!CharactersInScene.TryGetValue(Name, out CharacterData character)) {
 			Debug.LogError("Character is not in the scene");
-			return;
+			yield break;
 		}
 
 		foreach (Character temp in characterInfo.Characters) {
@@ -180,6 +172,7 @@ public class CharacterManager : MonoBehaviour {
 
 		Vector2 currentPosition = characterInfo.Characters[index].CharacterPosition;
 
+		Coroutine coroutine;
 
 		if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
 			Debug.Log(Name);
@@ -193,10 +186,15 @@ public class CharacterManager : MonoBehaviour {
 
 			TempLerpData.Remove(Name);
 
-			enumerators.Add(Name, StartCoroutine(Lerp(tempPos, position, speed, character)));
+			coroutine = StartCoroutine(Lerp(tempPos, position, speed, character));
+
+			enumerators.Add(Name, coroutine);
 
 			characterInfo.Characters[index].CharacterPosition = position;
-			return;
+
+			yield return coroutine;
+
+			yield break;
 		}
 
 		currentPosition = GetPosition(currentPosition);
@@ -204,19 +202,23 @@ public class CharacterManager : MonoBehaviour {
 
 		characterInfo.Characters[index].CharacterPosition = position;
 
-		enumerators.Add(Name, StartCoroutine(Lerp(currentPosition, position, speed, character)));
+		coroutine = StartCoroutine(Lerp(currentPosition, position, speed, character));
+
+		enumerators.Add(Name, coroutine);
+
+		yield return coroutine;
 	}
 
-	public void ChangeCharacterState(string Name, CharacterState state, bool transition = false, float speed = 0.5f) {
+	public IEnumerator ChangeCharacterState(string Name, CharacterState state, bool transition = false, float speed = 0.5f) {
 		CharactersInScene.TryGetValue(Name, out CharacterData character);
 
 		if (character == null) {
 			Debug.LogError("Character is not in the scene");
-			return;
+			yield break;
 		}
 
 		if (transition) {
-			StartCoroutine(TransitionCharacterState(state, character, speed));
+			yield return StartCoroutine(TransitionCharacterState(state, character, speed));
 		} else {
 			if (character.ExpressionLayer == null) {
 				character.BaseLayer.sprite = state.StateImage;
@@ -237,14 +239,14 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	public void RemoveCharacterFromScene(string Name, Vector2 position, bool exitScene = false, float speed = 0f, bool FadeOut = false, float FadeSpeed = 0.5f) {
+	public IEnumerator RemoveCharacterFromScene(string Name, Vector2 position, bool exitScene = false, float speed = 0f, bool FadeOut = false, float FadeSpeed = 0.5f) {
 		int index = 0;
 
 		CharactersInScene.TryGetValue(Name, out CharacterData character);
 
 		if (character == null) {
 			Debug.LogError("Character is not in the scene");
-			return;
+			yield break;
 		}
 
 		foreach (Character temp in characterInfo.Characters) {
@@ -257,36 +259,66 @@ public class CharacterManager : MonoBehaviour {
 		currentPosition = GetPosition(currentPosition);
 		position = GetPosition(position);
 
+		CharacterState state = characterInfo.Characters[index].CurrentState;
+
 		characterInfo.Characters[index].CharacterOnScene = false;
 		characterInfo.Characters[index].CharacterPosition = position;
 		characterInfo.Characters[index].CurrentState = null;
 
-		if (exitScene)
-			StartCoroutine(Lerp(currentPosition, position, speed, character));
 
-		if (FadeOut)
-			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, FadeSpeed, true));
-		else
-			StartCoroutine(FadeOutCharacter(characterInfo.Characters[index].CurrentState, character, 0f, true));
+
+		if (exitScene) {
+			if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
+				Debug.Log(Name);
+				StopCoroutine(enumerator);
+
+				position = GetPosition(position);
+
+				TempLerpData.TryGetValue(Name, out Vector2 tempPos);
+
+				enumerators.Remove(Name);
+
+				TempLerpData.Remove(Name);
+
+				enumerators.Add(Name, StartCoroutine(Lerp(tempPos, position, speed, character)));
+
+				characterInfo.Characters[index].CharacterPosition = position;
+			} else
+				StartCoroutine(Lerp(currentPosition, position, speed, character));
+		}
 
 		CharactersInScene.Remove(Name);
+
+		if (FadeOut)
+			yield return StartCoroutine(FadeOutCharacter(state, character, FadeSpeed, true));
+		else
+			StartCoroutine(FadeOutCharacter(state, character, 0f, true));
 	}
 
-	public void UpadteCharacterPosition(GameObject _character) {
-		foreach (Character character in characterInfo.Characters) {
-			if (character.CharacterName == _character.name) {
-				_character.transform.GetComponent<RectTransform>().position = GetPosition(character.CharacterPosition);
-			}
+	public void SetCharacterIndex(string name, int index) {
+		if(!CharactersInScene.TryGetValue(name, out CharacterData character)) {
+			Debug.LogError("Character is not in scene");
+			return;
 		}
-		resolution.x = Screen.width;
-		resolution.y = Screen.height;
+
+		if(index >= CharactersInScene.Count) {
+			index = CharactersInScene.Count - 1;
+		}
+
+		if(index < 0) {
+			index = 0;
+		}
+
+		character.characterGO.transform.SetSiblingIndex(index);
+
+		Debug.Log(name + "'s index set to " + index);
 	}
 
 	public void RemoveAllCharactersFromScene() {
 		StopAllCoroutines();
 		foreach(Character character in characterInfo.Characters) {
 			if(character.CharacterOnScene) {
-				RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition);
+				StartCoroutine(RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition));
 				Debug.Log(character.CharacterName);
 			}
 		}
@@ -296,17 +328,12 @@ public class CharacterManager : MonoBehaviour {
 		return CharactersInScene.TryGetValue(name, out CharacterData data);
 	}
 
-	public Vector2 GetPosition(Vector2 position, bool OverrideValues = false) {
-		if (OverrideValues) {
-			position.x /= resolution.x;
-			position.y /= resolution.y;
-		} else {
-			position.x /= 2650;
-			position.y /= 1440;
-		}
+	public Vector2 GetPosition(Vector2 position) {
+		position.x /= 2650;
+		position.y /= 1440;
 
-		position.x *= Screen.width;
-		position.y *= Screen.height;
+		position.x *= 1920;
+		position.y *= 1080;
 
 		return position;
 	}
@@ -314,11 +341,20 @@ public class CharacterManager : MonoBehaviour {
 	IEnumerator Lerp(Vector2 startingPos, Vector2 Pos, float lerpDuration, CharacterData character) {
 		float timeElapsed = 0;
 
-		TempLerpData.Add(character.characterGO.name, new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration)));
+		string name = character.characterGO.name;
+
+		TempLerpData.Add(name, new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration)));
 
 		while (timeElapsed < lerpDuration) {
+			if (character.characterGO == null) {
+				enumerators.Remove(name);
+				TempLerpData.Remove(name); 
+				yield break; 
+			}
 
-			character.characterGO.transform.GetComponent<RectTransform>().position = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
+			float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
+
+			character.characterGO.transform.GetComponent<RectTransform>().position = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, lerpProgress), Mathf.Lerp(startingPos.y, Pos.y, lerpProgress));
 
 			if (TempLerpData.TryGetValue(character.characterGO.name, out Vector2 tempPos))
 				TempLerpData[character.characterGO.name] = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
@@ -329,8 +365,8 @@ public class CharacterManager : MonoBehaviour {
 			yield return null;
 		}
 		character.characterGO.transform.GetComponent<RectTransform>().position = Pos;
-		enumerators.Remove(character.characterGO.name);
-		TempLerpData.Remove(character.characterGO.name);
+		enumerators.Remove(name);
+		TempLerpData.Remove(name);
 	}
 
 	IEnumerator FadeInCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
@@ -381,18 +417,29 @@ public class CharacterManager : MonoBehaviour {
 
 					character.BaseLayer = baseLayer.GetComponent<Image>();
 
+					character.BaseLayer.SetNativeSize();
+
+					character.BaseLayer.rectTransform.pivot = Vector2.zero;
+					character.BaseLayer.rectTransform.anchorMin = Vector2.zero;
+					character.BaseLayer.rectTransform.anchorMax = Vector2.one;
+					character.BaseLayer.rectTransform.localPosition = Vector2.zero;
+					character.BaseLayer.rectTransform.sizeDelta = Vector2.one;
+
 					character.BaseLayer.color = new Color32(255, 255, 255, 0);
 
 					while (timeElapsed < lerpDuration) {
-
 						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+						float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
+
+						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
 
 						timeElapsed += Time.deltaTime;
 
 						yield return null;
 					}
+
+					Destroy(baselayer);
 
 					break;
 				}
@@ -425,11 +472,12 @@ public class CharacterManager : MonoBehaviour {
 
 							baseLayer.GetComponent<Image>().sprite = state.BaseImage;
 
-							character.characterGO.AddComponent<Image>();
-							character.characterGO.GetComponent<Image>().sprite = state.BaseImage;
-							character.characterGO.GetComponent<Image>().SetNativeSize();
+							if (!character.characterGO.TryGetComponent(out Image img))
+								img = character.characterGO.AddComponent<Image>();
+							img.sprite = state.BaseImage;
+							img.SetNativeSize();
 
-							Destroy(character.characterGO.GetComponent<Image>());
+							Destroy(img);
 
 							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
 							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
@@ -455,13 +503,16 @@ public class CharacterManager : MonoBehaviour {
 
 						while (timeElapsed < lerpDuration) {
 
+							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
+
 							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
+
 
 							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
 
 							timeElapsed += Time.deltaTime;
 
@@ -472,7 +523,7 @@ public class CharacterManager : MonoBehaviour {
 						Destroy(expressionlayer);
 						break;
 					}
-					if (character.BaseLayer.sprite != state.BaseImage) {
+					if (character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite == state.StateImage) {
 						float timeElapsed = 0;
 						GameObject baselayer = character.BaseLayer.gameObject;
 
@@ -491,7 +542,9 @@ public class CharacterManager : MonoBehaviour {
 
 							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
+
+							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
 
 							timeElapsed += Time.deltaTime;
 
@@ -500,7 +553,7 @@ public class CharacterManager : MonoBehaviour {
 
 						Destroy(baselayer);
 					}
-					if (character.ExpressionLayer.sprite != state.StateImage) {
+					if (character.BaseLayer.sprite == state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
 						float timeElapsed = 0;
 						GameObject expressionlayer = character.ExpressionLayer.gameObject;
 						GameObject expressionLayer;
@@ -513,11 +566,12 @@ public class CharacterManager : MonoBehaviour {
 							expressionLayer.AddComponent<RectTransform>();
 							expressionLayer.AddComponent<Image>();
 
-							character.characterGO.AddComponent<Image>();
-							character.characterGO.GetComponent<Image>().sprite = state.BaseImage;
-							character.characterGO.GetComponent<Image>().SetNativeSize();
+							if(!character.characterGO.TryGetComponent(out Image img))
+								 img = character.characterGO.AddComponent<Image>();
+							img.sprite = state.BaseImage;
+							img.SetNativeSize();
 
-							Destroy(character.characterGO.GetComponent<Image>());
+							Destroy(img);
 
 							expressionLayer.GetComponent<RectTransform>().localScale = Vector3.one;
 
@@ -534,7 +588,7 @@ public class CharacterManager : MonoBehaviour {
 
 							expressionLayer.transform.SetParent(character.characterGO.transform);
 
-							expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
+							expressionLayer.GetComponent<RectTransform>().sizeDelta = Vector2.one;
 							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
 
 							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
@@ -546,7 +600,9 @@ public class CharacterManager : MonoBehaviour {
 
 							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
 
-							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed * 1.5f / lerpDuration));
+							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
+
+							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
 
 							timeElapsed += Time.deltaTime;
 

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-public class SentenceManager : MonoBehaviour {
+
+[CreateAssetMenu(fileName = "Sentence Manager", menuName = "Sentence Manager", order = 1)]
+public class SentenceManager : ScriptableObject {
 
 	[HideInInspector]
 	public bool UseJSONFile;
@@ -16,7 +17,7 @@ public class SentenceManager : MonoBehaviour {
 	public Chapter[] Chapters;
 
 	public void Start() {
-		if(Translating) {
+		if (Translating) {
 			return;
 		}
 
@@ -25,7 +26,7 @@ public class SentenceManager : MonoBehaviour {
 		scriptmanager.NextSentence();
 	}
 
-	public void ImportSentenceDataJSON () {
+	public void ImportSentenceDataJSON() {
 		JSONSentenceImporter JsonSentenceImporter = (JSONSentenceImporter)FindObjectOfType(typeof(JSONSentenceImporter));
 		CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
 
@@ -35,15 +36,17 @@ public class SentenceManager : MonoBehaviour {
 		JsonSentenceImporter.LoadFromJSON();
 	}
 
-	public void ImportSentenceDataCS () {
+	public void ImportSentenceDataCS() {
 		CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
 
 		SentenceTools.sentenceManager = this;
 		SentenceTools.characterInfo = characterInfo;
+	}
 
-		//SentenceTools.AddChapter("ChapterName");
-		//SentenceTools.AddSentence("ChapterName", "Test Character 3", "Testing if choice options are working", Sentence.ArtworkType.None);
-		SentenceTools.AddCharacterState("Test Character 2", "state", CharacterState.StateType.SingleLayer, "mashs_0.png");
+	public void ExportSentenceDataJson() {
+		JSONSentenceImporter JsonSentenceImporter = (JSONSentenceImporter)FindObjectOfType(typeof(JSONSentenceImporter));
+
+		JsonSentenceImporter.ExportFromJSON();
 	}
 }
 
@@ -53,17 +56,23 @@ public class Chapter {
 
 	public string ChapterName = "";
 
+	[ArrayToList("GetChapterNames")]
 	[Tooltip("What chapter should be played after all the sentences in this chapter?")]
 	public int NextChapter = -1;
 
-	public Sentence[] Sentences;
+	public List<Sentence> Sentences;
 
 	public List<List<CharacterSaveData>> characterSaves = new List<List<CharacterSaveData>>();
-}  
+}
 
 [Serializable]
 public class Sentence {
-		
+
+	[HideInInspector]
+	public bool ChoiceActive;
+
+	[HideInInspector]
+	public bool onSentenceInitActive;
 
 	[Tooltip("Character's name")]
 	[ArrayToList("GetCharacterNames")]
@@ -71,40 +80,29 @@ public class Sentence {
 
 	public bool OverrideName;
 
-	[ConditionalHide("OverrideName", true)]
+	[DrawIf("OverrideName", true)]
 	public string DisplayName;
 
 	[Tooltip("Character's sentence")]
-	[TextArea]
+	[TextArea(3,15)]
 	public string Text;
 
 	[Tooltip("Transition to the text")]
 	public Transition transition;
 
-	public ArtworkType artworkType = ArtworkType.None;
-
-	[DrawIf("artworkType", ArtworkType.BackgroundImage)]
-	[Tooltip("Background used ID (for more info look at CG Manager)")]
-	public int BG_ID = -1;
-
-	[DrawIf("artworkType", ArtworkType.CGImage)]
-	[Tooltip("CG used ID (for more info look at CG Manager)")]
-	public int CG_ID = -1;
-
 	[Tooltip("Is this sentence a choice?")]
 	public bool Choice = true;
 
-	[Tooltip("Choice Options (will be used if Choice option is ticked above)")]
 	public Option[] choiceOptions;
 
 	[Tooltip("Was the text line viewed already?")]
 	public bool Viewed;
 
-	[Tooltip("Is the sentence voiced?")]    
+	[Tooltip("Is the sentence voiced?")]
 	public bool Voiced;
 
-	[Tooltip("VA clip (will be used if Voiced is is ticked above)")]
 	[DrawIf("Voiced", true)]
+	[Tooltip("VA clip (will be used if Voiced is is ticked above)")]
 	public AudioClip VoiceClip;
 
 	[Tooltip("Actions taken when the sentence is played")]
@@ -113,7 +111,6 @@ public class Sentence {
 	//not important
 	[SerializeField]
 	public enum Transition { None, FadeOut };
-	public enum ArtworkType { None, BackgroundImage, CGImage };
 }
 
 [Serializable]
@@ -124,12 +121,16 @@ public class Option {
 
 [Serializable]
 public class OnSentenceInit {
+
 	public Actions actionType;
 
 	[ArrayToList("GetCharacterNames")]
 	public string CharacterName;
 
-	[ArrayToList("GetCharacterStates", "CharacterName")]
+	[ArrayToList("GetCharacterVariants", "CharacterName")]
+	public string CharacterVariant;
+
+	[ArrayToList("GetCharacterStates", "CharacterName", "CharacterVariant")]
 	public string CharacterState;
 
 	[Tooltip("Wait x seconds before executing the next action")]
@@ -141,8 +142,26 @@ public class OnSentenceInit {
 
 	public bool Transition;
 
-	[Range(1,0)]
-	public float FadeSpeed;
+	[Range(2, 0)]
+	public float FadeSpeed = 0.5f;
+
+	public bool advanced = false;
+
+	public Vector2 CharacterOffset;
+
+	[ArrayToList("GetBGList")]
+	[Tooltip("Background used")]
+	public int BG;
+
+	[ArrayToList("GetCGList")]
+	[Tooltip("CG used")]
+	public int CG;
+
+	[Tooltip("Higher index means that the character will appear in front of other characters, lower - behind them")]
+	public int CharacterIndex;
+
+	[Tooltip("If checked, the code will return to regular operation after the action is finished, if not, the code will run until this action is called again.")]
+	public bool RunOnlyOnce;
 
 	[Tooltip("Should the character enter the scene or just be spawned in?")]
 	public bool EnterScene = true;
@@ -155,14 +174,39 @@ public class OnSentenceInit {
 	public Vector2 customStartingPosition;
 
 	[Range(2, 0)]
-	public float transitionSpeed = 0.1f;
+	public float transitionSpeed = 1.43f;
 
 	[Tooltip("Position that the character is going to be placed in(2650x1440 base resolution, downscaled bsaed on the screen resolution)")]
 	public Vector2 Position;
 
-	public enum Actions { AddCharacterToScene, MoveCharacter, RemoveCharacterFromScene, ChangeCharacterState, Delay };
+	public enum Actions { AddCharacterToScene, MoveCharacter, ShowTransition, ShowBG, ShowCG, RemoveCharacterFromScene, ChangeCharacterState, Delay, WaitUntilActionIsFinished, SetCharacterIndex, PlayBGM };
 	public enum StartingPlace { Left, Right, Custom };
+
+	public OnSentenceInit() {
+		FadeSpeed = 0.7f;
+		transitionSpeed = 1.43f;
+	}
+
+	public OnSentenceInit(Actions actionType = 0, string characterName = "", string characterState = "", float delay = 0f, bool fadeIn = false, bool fadeOut = false, bool transition = false, float fadeSpeed = 0.7f, int bg = 0, int cg = 0, int characterIndex = 0, bool runOnlyOnce = false, bool enterScene = false, bool exitScene = false, StartingPlace startingPosition = StartingPlace.Left, Vector2 customStartingPosition = default, float transitionSpeed = 1.43f, Vector2 position = default) {
+		this.actionType = actionType;
+		CharacterName = characterName;
+		CharacterState = characterState;
+		Delay = delay;
+		FadeIn = fadeIn;
+		FadeOut = fadeOut;
+		Transition = transition;
+		FadeSpeed = fadeSpeed;
+		BG = bg;
+		CG = cg;
+		CharacterIndex = characterIndex;
+		RunOnlyOnce = runOnlyOnce;
+		EnterScene = enterScene;
+		ExitScene = exitScene;
+		this.startingPosition = startingPosition;
+		this.customStartingPosition = customStartingPosition;
+		this.transitionSpeed = transitionSpeed;
+		Position = position;
+	}
 }
 
 #endregion
-

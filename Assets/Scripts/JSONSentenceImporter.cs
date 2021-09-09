@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -7,11 +8,17 @@ public class JSONSentenceImporter : MonoBehaviour {
 	public SentenceData sentenceData;
 
 	public void LoadFromJSON() {
-		if (File.Exists("Assets/Sentences/SentenceData.json")) {
-			string JsonData = "";
-			StreamReader reader = new StreamReader("Assets/Sentences/SentenceData.json");
-			JsonData = reader.ReadToEnd();
+		string filePath = UnityEditor.EditorUtility.OpenFilePanel("Select file to load", "/Assets/Sentences/", "json");
+
+		if (File.Exists(filePath)) {
+			StreamReader reader = new StreamReader(filePath);
+			string JsonData = "" + reader.ReadToEnd();
+
+			Debug.Log(JsonData);
+
 			sentenceData = JsonUtility.FromJson<SentenceData>(JsonData);
+
+			reader.Close();
 			#region SentenceImport
 
 			SentenceManager sentenceManager = (SentenceManager)FindObjectOfType(typeof(SentenceManager));
@@ -21,7 +28,7 @@ public class JSONSentenceImporter : MonoBehaviour {
 			foreach (chap ch in sentenceData.chapters) {
 				SentenceTools.AddChapter(ch.ChapterName, ch.NextChapter);
 				foreach (sent sen in ch.sentences) {
-					SentenceTools.AddSentence(ch.ChapterName, sen.Name, sen.Text, sen.artworkType, sen.BG_ID, sen.CG_ID, sen.Choice, sen.choiceOptions, sen.Voiced, sen.VoiceClip);
+					SentenceTools.AddSentence(ch.ChapterName, sen.Name, sen.NameOverride, sen.DisplayName, sen.Text, sen.Choice, sen.choiceOptions, sen.Voiced, sen.VoiceClip);
 				}
 			}
 			#endregion
@@ -31,6 +38,8 @@ public class JSONSentenceImporter : MonoBehaviour {
 			CharacterInfo characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
 
 			SentenceTools.characterInfo = characterInfo;
+
+			if (sentenceData.characterData == null) return;
 
 			foreach (CharData charData in sentenceData.characterData) {
 				Color32 NameColor = default;
@@ -84,6 +93,47 @@ public class JSONSentenceImporter : MonoBehaviour {
 			File.WriteAllText("Assets/Sentences/SentenceData.json", tmp);
 		}
 	}
+	public void ExportFromJSON() {
+		SentenceManager sentenceManager = FindObjectOfType<SentenceManager>();
+
+		SentenceData data = new SentenceData();
+
+		List<chap> chapters = new List<chap>();
+
+		foreach(Chapter chapter in sentenceManager.Chapters) {
+			chap Chap = new chap();
+
+			Chap.ChapterName = chapter.ChapterName;
+			Chap.NextChapter = chapter.NextChapter;
+
+			List<sent> sentences = new List<sent>();
+
+			foreach(Sentence sentence in chapter.Sentences) {
+				sent Sent = new sent();
+
+				Sent.Name = sentence.Name;
+				Sent.NameOverride = sentence.OverrideName;
+				Sent.DisplayName = sentence.DisplayName;
+				Sent.Text = sentence.Text;
+				Sent.Choice = sentence.Choice;
+				Sent.choiceOptions = sentence.choiceOptions;
+				Sent.Viewed = sentence.Viewed;
+				Sent.Voiced = sentence.Voiced;
+				Sent.VoiceClip = UnityEditor.AssetDatabase.GetAssetPath(sentence.VoiceClip);
+				Sent.sentenceActions = sentence.onSentenceInit;
+
+				sentences.Add(Sent);
+			}
+
+			Chap.sentences = sentences.ToArray();
+			chapters.Add(Chap);
+		}
+
+		data.chapters = chapters.ToArray();
+
+		string JsonData = JsonUtility.ToJson(data, true);
+		File.WriteAllText("Assets/Sentences/SentenceDataV2.json", JsonData);
+	}
 }
 
 [System.Serializable]
@@ -103,12 +153,11 @@ public class chap {
 public class sent {
 	public string Name;
 
+	public bool NameOverride = false;
+
+	public string DisplayName = "";
+
 	public string Text;
-
-	public Sentence.ArtworkType artworkType = Sentence.ArtworkType.None;
-
-	public int BG_ID;
-	public int CG_ID;
 
 	public bool Choice;
 
@@ -120,7 +169,7 @@ public class sent {
 
 	public string VoiceClip;
 
-	public SentenceActionData[] sentenceActions;
+	public OnSentenceInit[] sentenceActions;
 }
 
 [Serializable]

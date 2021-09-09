@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(CGManager))]
+[RequireComponent(typeof(CharacterInfo))]
+[RequireComponent(typeof(ChapterManager))]
+[RequireComponent(typeof(CharacterManager))]
 public class DialogueManager : MonoBehaviour {
 
 	public GameObjects gameObjects;
@@ -20,7 +24,7 @@ public class DialogueManager : MonoBehaviour {
 	[HideInInspector]
 	public int BacklogID = 0;
 
-	private bool ShowTextRun = false;
+	public bool ShowTextRun = false;
 
 	private bool ignoreSentenceActions;
 
@@ -33,11 +37,16 @@ public class DialogueManager : MonoBehaviour {
 	[HideInInspector]
 	public bool disableInput = false;
 
-	private bool automode = false;
+	public bool automode = false;
+
+	private bool WaitUntilMotionIsfinishedTemp = false;
+	private bool WaitUntilMotionIsfinished = false;
 
 	private Character currentCharacter = new Character();
 
-	[HideInInspector]
+	private Coroutine cubeAnim;
+
+	//[HideInInspector]
 	public bool automodeRunning = false;
 	[Range(0, 6)]
 	[Tooltip("How many seconds should automode wait before showing next line?")]
@@ -50,6 +59,8 @@ public class DialogueManager : MonoBehaviour {
 		choiceNext = false;
 
 		CalculateCharacterData();
+
+		NextSentence();
 	}
 
 	void Update() {
@@ -60,8 +71,10 @@ public class DialogueManager : MonoBehaviour {
 				automode = false;
 			}
 			if (Input.mouseScrollDelta.y > 0 || Input.GetKeyDown(KeyCode.PageUp)) {
-				if (!gameObjects.BacklogGameobject.activeInHierarchy)
+				if (!gameObjects.BacklogGameobject.activeInHierarchy) {
 					gameObjects.BacklogGameobject.SetActive(true);
+					gameObjects.DisplayGameobject.SetActive(false);
+				}
 			}
 
 			if (Input.GetMouseButtonDown(0)) {
@@ -80,6 +93,7 @@ public class DialogueManager : MonoBehaviour {
 
 			if (Input.GetButtonDown("Skip")) {
 				skipmode = true;
+				automode = false;
 				textBox.TypeText = false;
 			}
 			if (Input.GetButtonUp("Skip")) {
@@ -90,16 +104,14 @@ public class DialogueManager : MonoBehaviour {
 			if (skipmode && !gameObjects.ChoiceList.activeInHierarchy && !gameObjects.BacklogGameobject.activeInHierarchy && gameObjects.DisplayGameobject.activeInHierarchy) { StartCoroutine(Skiptext()); }
 
 			if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("escape")) {
-				if (gameObjects.BacklogGameobject.activeInHierarchy)
+				if (gameObjects.BacklogGameobject.activeInHierarchy) {
 					gameObjects.BacklogGameobject.SetActive(false);
+					gameObjects.DisplayGameobject.SetActive(true);
+				}
 			}
 
 			if (automode && !automodeRunning) {
 				StartCoroutine(AutoMode());
-			}
-			if (!automode && automodeRunning) {
-				StopCoroutine(AutoMode());
-				automodeRunning = false;
 			}
 		}
 
@@ -112,12 +124,14 @@ public class DialogueManager : MonoBehaviour {
 	}
 
 	public void ToggleAutoMode() {
-		if (automode) { automode = false; } else { automode = true; }
+		automode = !automode;
 	}
 
 	public void NextSentence() {
+		if(cubeAnim != null) StopCoroutine(cubeAnim);
+
 		if (!ShowTextRun) {
-			if (BacklogID != scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences.Length || scripts.ChapterManagerScript.CurrentChapterIndex != scripts.sentenceManager.Chapters.Length - 1 && choiceNext == true) {
+			if (BacklogID != scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences.Count || scripts.ChapterManagerScript.CurrentChapterIndex != scripts.sentenceManager.Chapters.Length - 1 && choiceNext == true) {
 				if (!choiceNext) {
 					Sentence sentence = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID];
 
@@ -126,7 +140,8 @@ public class DialogueManager : MonoBehaviour {
 							currentCharacter = character;
 					}
 
-					textBox.NameText.text = sentence.Name;
+					if (sentence.OverrideName) textBox.NameText.text = sentence.DisplayName;
+					else textBox.NameText.text = sentence.Name;
 
 					PlayVoice(sentence.VoiceClip);
 
@@ -136,29 +151,18 @@ public class DialogueManager : MonoBehaviour {
 
 					if (textBox.TypeText) {
 						StartCoroutine(ShowText(sentence.Text));
-						ShowTextRun = true;
 					} else {
 						textBox.SentenceText.text = sentence.Text;
 					}
 
 					sentence.Viewed = true;
-					switch (sentence.artworkType) {
-						case Sentence.ArtworkType.BackgroundImage: {
-								scripts.CGManagerScript.ShowBG(sentence.BG_ID);
-								break;
-							}
-						case Sentence.ArtworkType.CGImage: {
-								scripts.CGManagerScript.ShowCG(sentence.CG_ID);
-								break;
-							}
-					}
 
 					if (sentence.Choice) {
 						choiceNext = true;
 						Debug.Log("Choice detected");
 					}
 
-					if(!ignoreSentenceActions) {
+					if (!ignoreSentenceActions) {
 						StartCoroutine(CallOnSentenceInit(sentence));
 					}
 
@@ -179,7 +183,7 @@ public class DialogueManager : MonoBehaviour {
 				Chapter chapter = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex];
 				int nextChapterIndex = chapter.NextChapter;
 
-				if(scripts.sentenceManager.Chapters.Length <= nextChapterIndex) {
+				if (scripts.sentenceManager.Chapters.Length <= nextChapterIndex) {
 					nextChapterIndex = -1;
 				}
 
@@ -206,10 +210,18 @@ public class DialogueManager : MonoBehaviour {
 					Debug.Log("End of sentences.");
 			}
 		} else {
-			Sentence sentence = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID - 1];
-			StopCoroutine(ShowText(sentence.Text));
-			textBox.SentenceText.maxVisibleCharacters = sentence.Text.Length;
 			ShowTextRun = false;
+			Sentence sentence = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID - 1];
+			textBox.SentenceText.maxVisibleCharacters = sentence.Text.Length + 15;
+		}
+	}
+
+	public void LastSentence() {
+		if (BacklogID < 1) {
+			if (scripts.ChapterManagerScript.CurrentChapterIndex < 1)
+				JumpTo(scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex - 1].Sentences.Count - 1, scripts.ChapterManagerScript.CurrentChapterIndex - 1);
+		} else {
+			JumpTo(BacklogID - 1, scripts.ChapterManagerScript.CurrentChapterIndex);
 		}
 	}
 
@@ -238,23 +250,74 @@ public class DialogueManager : MonoBehaviour {
 								}
 						}
 
-						scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed);
-						continue;
+						if (WaitUntilMotionIsfinished || WaitUntilMotionIsfinishedTemp) {
+							WaitUntilMotionIsfinishedTemp = false;
+							yield return StartCoroutine(scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed));
+							continue;
+						} else {
+							StartCoroutine(scripts.characterManagerScript.AddCharacterToScene(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Position, action.EnterScene, startingPosition, action.transitionSpeed, action.FadeIn, action.FadeSpeed));
+							continue;
+						}
 					}
 				case OnSentenceInit.Actions.MoveCharacter: {
-						scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed);
-						continue;
+						if (WaitUntilMotionIsfinished || WaitUntilMotionIsfinishedTemp) {
+							WaitUntilMotionIsfinishedTemp = false;
+							yield return StartCoroutine(scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed));
+							continue;
+						} else {
+							StartCoroutine(scripts.characterManagerScript.MoveCharacter(action.CharacterName, action.Position, action.transitionSpeed));
+							continue;
+						}
 					}
 				case OnSentenceInit.Actions.RemoveCharacterFromScene: {
-						scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed);
-						continue;
+						if (WaitUntilMotionIsfinished || WaitUntilMotionIsfinishedTemp) {
+							WaitUntilMotionIsfinishedTemp = false;
+							yield return StartCoroutine(scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed));
+							continue;
+						} else {
+							StartCoroutine(scripts.characterManagerScript.RemoveCharacterFromScene(action.CharacterName, action.Position, action.ExitScene, action.transitionSpeed, action.FadeOut, action.FadeSpeed));
+							continue;
+						}
+
 					}
 				case OnSentenceInit.Actions.ChangeCharacterState: {
-						scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.FadeSpeed);
-						continue;
+						if (WaitUntilMotionIsfinished || WaitUntilMotionIsfinishedTemp) {
+							WaitUntilMotionIsfinishedTemp = false;
+							if (action.Transition) {
+								yield return StartCoroutine(scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.transitionSpeed));
+								continue;
+							} else {
+								StartCoroutine(scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.transitionSpeed));
+								continue;
+							}
+						} else {
+							StartCoroutine(scripts.characterManagerScript.ChangeCharacterState(action.CharacterName, GetCharacterState(action.CharacterName, action.CharacterState), action.Transition, action.transitionSpeed));
+							continue;
+						}
 					}
 				case OnSentenceInit.Actions.Delay: {
 						yield return new WaitForSeconds(action.Delay);
+						continue;
+					}
+				case OnSentenceInit.Actions.ShowBG: {
+						scripts.CGManagerScript.ShowBG(action.BG, action.transitionSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.ShowCG: {
+						scripts.CGManagerScript.ShowCG(action.CG, action.transitionSpeed);
+						continue;
+					}
+				case OnSentenceInit.Actions.WaitUntilActionIsFinished: {
+						if (action.RunOnlyOnce) {
+							WaitUntilMotionIsfinishedTemp = true;
+							WaitUntilMotionIsfinished = false;
+						} else {
+							WaitUntilMotionIsfinished = !WaitUntilMotionIsfinished;
+						}
+						continue;
+					}
+				case OnSentenceInit.Actions.SetCharacterIndex: {
+						scripts.characterManagerScript.SetCharacterIndex(action.CharacterName, action.CharacterIndex);
 						continue;
 					}
 			}
@@ -282,9 +345,12 @@ public class DialogueManager : MonoBehaviour {
 		CharacterState characterState = new CharacterState();
 		foreach (Character character in scripts.CharacterInfoScript.Characters) {
 			if (character.CharacterName == CharacterName) {
-				foreach (CharacterState state in character.CharacterStates) {
-					if (state.StateName == stateName) {
-						characterState = state;
+				foreach (CharacterVariant variant in character.characterVariants) {
+					foreach (CharacterState state in variant.variantStates) {
+						if (state.StateName == stateName) {
+							characterState = state;
+							return characterState;
+						}
 					}
 				}
 			}
@@ -309,16 +375,33 @@ public class DialogueManager : MonoBehaviour {
 	}
 
 	public IEnumerator ShowText(string text) {
+		ShowTextRun = true;
+
 		textBox.SentenceText.maxVisibleCharacters = 1;
 		textBox.SentenceText.text = text;
 		yield return new WaitForSeconds(textBox.TextSpeed);
 
-		for (int i = 1; i < text.Length; i++) {
+		while (textBox.SentenceText.maxVisibleCharacters < textBox.SentenceText.text.Length && ShowTextRun) {
 			textBox.SentenceText.maxVisibleCharacters += 1;
 			yield return new WaitForSeconds(textBox.TextSpeed);
 		}
 
+		textBox.SentenceText.maxVisibleCharacters += 15;
+
 		ShowTextRun = false;
+
+		cubeAnim = StartCoroutine(CubeAnimation(text));
+	}
+
+	public IEnumerator CubeAnimation(string text) {
+		while (true) {
+			for(int i = 0; i < 32; i++) {
+				textBox.SentenceText.text = text + "<sprite=" + i +">";
+				yield return new WaitForSeconds(0.07f);
+			}
+
+			yield return new WaitForSeconds(0.1f);
+		}
 	}
 
 	public IEnumerator Skiptext() {
@@ -328,23 +411,32 @@ public class DialogueManager : MonoBehaviour {
 
 	public IEnumerator AutoMode() {
 		automodeRunning = true;
-		while (ShowTextRun) {
+		while (automode) {
+			while (ShowTextRun) {
+				yield return null;
+			}
+			yield return new WaitForSeconds(scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex].Sentences[BacklogID - 1].Text.Length * textBox.TextSpeed + AutomodeDelay);
+			if (!gameObjects.ChoiceList.activeInHierarchy) { NextSentence(); } else automode = false;
+
 			yield return null;
 		}
-		yield return new WaitForSeconds(AutomodeDelay);
-		if (!gameObjects.ChoiceList.activeInHierarchy) { NextSentence(); }
 		automodeRunning = false;
 	}
 
 	public void JumpTo(int ID, int chapterIndex) {
+		Debug.Log(ID);
+		Debug.Log(chapterIndex);
+
 		scripts.characterManagerScript.RemoveAllCharactersFromScene();
 
-		foreach(CharacterSaveData data in scripts.sentenceManager.Chapters[chapterIndex].characterSaves[ID]) {
-			if(data.CharacterOnScene && !scripts.characterManagerScript.CharacterInScene(data.CharacterName)) {
+
+		foreach (CharacterSaveData data in scripts.sentenceManager.Chapters[chapterIndex].characterSaves[ID]) {
+			if (data.CharacterOnScene && !scripts.characterManagerScript.CharacterInScene(data.CharacterName)) {
 				scripts.characterManagerScript.AddCharacterToScene(data.CharacterName, GetCharacterState(data.CharacterName, data.stateName), new Vector2(data.CharacterPosition[0], data.CharacterPosition[1]));
 				Debug.Log(data.CharacterName + " added");
 			}
 		}
+
 
 		ignoreSentenceActions = true;
 
@@ -455,15 +547,17 @@ public class DialogueManager : MonoBehaviour {
 	public void CalculateCharacterData() {
 		Chapter nextChapter = scripts.sentenceManager.Chapters[scripts.ChapterManagerScript.CurrentChapterIndex];
 
-		GameObject chapterJump = Instantiate(buttonPrefabs.ChapterJumpItemPreset, buttonArrays.ChapterJumpArray);
-		chapterJump.name = nextChapter.ChapterName;
+		if(buttonArrays.ChapterJumpArray != null) {
+			GameObject chapterJump = Instantiate(buttonPrefabs.ChapterJumpItemPreset, buttonArrays.ChapterJumpArray);
+			chapterJump.name = nextChapter.ChapterName;
 
-		ChapterJumpItem item = chapterJump.GetComponent<ChapterJumpItem>();
+			ChapterJumpItem item = chapterJump.GetComponent<ChapterJumpItem>();
 
-		item.ChapterName = nextChapter.ChapterName;
-		item.ChapterIndex = scripts.ChapterManagerScript.CurrentChapterIndex;
-		item.IsCurrentChapter = true;
-
+			item.ChapterName = nextChapter.ChapterName;
+			item.ChapterIndex = scripts.ChapterManagerScript.CurrentChapterIndex;
+			item.IsCurrentChapter = true;
+		}
+		
 		List<List<CharacterSaveData>> characterData = new List<List<CharacterSaveData>>();
 
 		List<CharacterSaveData> chapterData = new List<CharacterSaveData>();
@@ -519,13 +613,13 @@ public class DialogueManager : MonoBehaviour {
 					chapterData.Add(characterSaveData);
 
 					string nostate = "None";
-					string state = (characterSaveData.stateName != null) ? characterSaveData.stateName : nostate;
+					string state = characterSaveData.stateName ?? nostate;
 
-					Debug.Log("Name: " + characterSaveData.CharacterName + ", On scene: " + characterSaveData.CharacterOnScene + ", Position: X" + characterSaveData.CharacterPosition[0] + ", Y" + characterSaveData.CharacterPosition[1] + ", State: " + state);
+					//Debug.Log("Name: " + characterSaveData.CharacterName + ", On scene: " + characterSaveData.CharacterOnScene + ", Position: X" + characterSaveData.CharacterPosition[0] + ", Y" + characterSaveData.CharacterPosition[1] + ", State: " + state);
 				}
-			}
 
-			characterData.Add(chapterData);
+				characterData.Add(chapterData);
+			}
 
 			chapter.characterSaves = characterData;
 		}
@@ -565,7 +659,7 @@ public class Scripts {
 	[Tooltip("List of CGs and info about them")]
 	public CGManager CGManagerScript;
 
-	[Tooltip("currentCharacter Dialoge lines")]
+	[Tooltip("Dialoge lines")]
 	public SentenceManager sentenceManager;
 
 	[Tooltip("Shared info about the currentCharacters (e.g. Text color)")]

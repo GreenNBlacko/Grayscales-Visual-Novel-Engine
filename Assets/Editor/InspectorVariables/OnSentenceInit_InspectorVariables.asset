@@ -1,0 +1,487 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce4128e71453c0740b807c412e8a0800, type: 3}
+  m_Name: OnSentenceInit_InspectorVariables
+  m_EditorClassIdentifier: 
+  inspectorVariables:
+  - variableName: actionType
+    variableType: 3
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies: []
+  - variableName: CharacterName
+    variableType: 1
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 1
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 5
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 9
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: CharacterVariant
+    variableType: 1
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: CharacterState
+    variableType: 1
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: Delay
+    variableType: 5
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 7
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: FadeIn
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: FadeOut
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 5
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: FadeSpeed
+    variableType: 5
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: FadeIn
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 5
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: FadeOut
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: BG
+    variableType: 0
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 3
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: CG
+    variableType: 0
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 4
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: CharacterIndex
+    variableType: 0
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 9
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: RunOnlyOnce
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 8
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: EnterScene
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: ExitScene
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 5
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: startingPosition
+    variableType: 3
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: EnterScene
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: customStartingPosition
+    variableType: 4
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: EnterScene
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: startingPosition
+      dependencyType: 2
+      comparedValue: 2
+      dependencyVerification: 0
+      verificationModifier: 0
+  - variableName: Transition
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 1
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 3
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 4
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: transitionSpeed
+    variableType: 5
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: EnterScene
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 3
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: Transition
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 4
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: Transition
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 0
+    - dependencyName: Transition
+      dependencyType: 1
+      comparedValue: true
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: advanced
+    variableType: 2
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: CharacterOffset
+    variableType: 4
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 6
+      dependencyVerification: 0
+      verificationModifier: 2
+  - variableName: Position
+    variableType: 4
+    displayType: 0
+    customVariableDisplay: 0
+    ModifierOptions: 0
+    Bounds: {x: 0, y: 0}
+    PopupOptions: 
+    ChildClassVariables: {fileID: 0}
+    offset: 2
+    witdh: -1
+    height: 16
+    variableDependencies:
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 0
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 1
+      dependencyVerification: 0
+      verificationModifier: 2
+    - dependencyName: actionType
+      dependencyType: 2
+      comparedValue: 5
+      dependencyVerification: 0
+      verificationModifier: 2

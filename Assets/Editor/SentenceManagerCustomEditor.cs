@@ -28,6 +28,10 @@ public class SentenceManagerCustomEditor : Editor {
 		if (GUILayout.Button("Load sentences from using sentence tools")) {
 			myScript.ImportSentenceDataCS();
 		}
+
+		if (GUILayout.Button("Save sentences to a JSON file")) {
+			myScript.ExportSentenceDataJson();
+		}
 	}
 }
 

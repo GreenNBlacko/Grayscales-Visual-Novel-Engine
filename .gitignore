@@ -15,4 +15,10 @@
 *.code-workspace
 *.userprefs
 *.meta
+*.csproj
 Assets/Scenes/Content.unity
+/Assets/Audio/Character/Saki
+/Assets/Sprites/BGs
+/Assets/Sprites/CGs
+/Assets/Sprites/Characters/Saki
+/Assets/Sprites/MenuItems
