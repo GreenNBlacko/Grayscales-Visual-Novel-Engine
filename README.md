@@ -21,7 +21,7 @@ My visual novel engine aims for simplicity for the user while having complete co
 - Create a new empty game object and name it **'ScriptManager'**.
 - Put these scripts in it: **DialogueManager, CharacterManager, ChapterManager, SaveLoadSystem, CharacterManager, JSONSentenceImporter**(only add this one if you plan to import sentences using a JSON file).
 - Right click in the 'project' window.
-- then, go to Create>Sentence Manager like shown in the image.
+- Then, go to Create>Sentence Manager like shown in the image.
 ![image](https://user-images.githubusercontent.com/45263750/132752576-bbe18e99-7a1c-4d61-b578-c1214cb63af8.png)
 - Name the file to your preference and don't forget to assign it to the **'DialogueManager'** script
 - Now, create a simple UI using the prefab given in the prefabs folder.
