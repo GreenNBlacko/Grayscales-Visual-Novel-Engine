@@ -32,9 +32,7 @@ public class Chapter {
 
 	public List<Sentence> Sentences;
 
-	public List<List<CharacterSaveData>> characterSaves = new List<List<CharacterSaveData>>();
-
-	
+	//public List<List<CharacterSaveData>> characterSaves = new List<List<CharacterSaveData>>();
 }
 
 

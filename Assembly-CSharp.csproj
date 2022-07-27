@@ -66,7 +66,6 @@
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSpline2d.cs" />
     <Compile Include="Assets\Utility\FieldNotFoundException.cs" />
     <Compile Include="Assets\Utility\ArrayToListAttribute.cs" />
-    <Compile Include="Assets\Scripts\SaveLoadSystem.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralCameraShake.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralSimpleUI.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSpline.cs" />
@@ -77,16 +76,12 @@
     <Compile Include="Assets\Scripts\SentenceManager.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplineEndless.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralBasic.cs" />
-    <Compile Include="Assets\Scripts\BacklogListItem.cs" />
     <Compile Include="Assets\Utility\NumericTypeExpectedException.cs" />
-    <Compile Include="Assets\Scripts\ChoiceListItem.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralAdvancedTechniques.cs" />
     <Compile Include="Assets\LeanTween\Framework\LTSeq.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralSequencer.cs" />
     <Compile Include="Assets\Utility\LogicExpressionParser.cs" />
-    <Compile Include="Assets\Scripts\ChapterManager.cs" />
     <Compile Include="Assets\LeanTween\Framework\LeanSmooth.cs" />
-    <Compile Include="Assets\Scripts\ChapterJumpItem.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplinePerformance.cs" />
     <Compile Include="Assets\LeanTween\Framework\LeanTest.cs" />
     <Compile Include="Assets\Scripts\SentenceTools.cs" />
@@ -96,9 +91,7 @@
     <Compile Include="Assets\Scripts\CustomInspectorVariables.cs" />
     <Compile Include="Assets\Scripts\Utility\SliderToScrollbar.cs" />
     <Compile Include="Assets\Utility\PropertyOrFieldNotFoundException.cs" />
-    <Compile Include="Assets\Scripts\GrabSS.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplineTrack.cs" />
-    <Compile Include="Assets\Scripts\DialogueManager.cs" />
     <Compile Include="Assets\Utility\PropertyNotFoundException.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\TestingZLegacy.cs" />
     <Compile Include="Assets\Utility\DrawIfAnyAttribute.cs" />
@@ -109,7 +102,6 @@
     <Compile Include="Assets\Scripts\CGManager.cs" />
     <Compile Include="Assets\Utility\DisableIfAttribute.cs" />
     <Compile Include="Assets\Utility\DrawIfAttribute.cs" />
-    <Compile Include="Assets\Scripts\JSONSentenceImporter.cs" />
     <Compile Include="Assets\Scripts\Hapymaher Specific\TopToolBar.cs" />
     <Compile Include="Assets\LeanTween\Framework\LeanTweenExt.cs" />
     <Compile Include="Assets\LeanTween\Framework\LTDescrOptional.cs" />

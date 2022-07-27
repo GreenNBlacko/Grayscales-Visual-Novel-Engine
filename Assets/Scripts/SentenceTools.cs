@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public static class SentenceTools {
 	public static SentenceManager sentenceManager = ScriptableObject.CreateInstance<SentenceManager>();
 
 	public static void AddChapter(string ChapterName, int NextChapter = -1) {
-		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
 
 		Chapter chapter = new Chapter();
 
@@ -21,7 +19,6 @@ public static class SentenceTools {
 	}
 
 	public static void AddSentence(int ChapterName, int Name, bool OverrideName, string displayName, string Sentence, bool Choice = false, bool Voiced = false, string VoiceClip = "") {
-
 		int senIndex = sentenceManager.Chapters[ChapterName].Sentences.Count;
 
 		sentenceManager.Chapters[ChapterName].Sentences.Add(new Sentence());
@@ -78,7 +75,7 @@ public static class SentenceTools {
 		return new Color32(r, g, b, a);
 	}
 
-	public static void AddCharacter(string characterName, Color32 nameColor = default, Color32 textColor = default, Character.GradientType gradientType = Character.GradientType.Name, Color32 nameColorGradient = default, Color32 textColorGradient = default, Color32 colorGradient = default) {
+	public static void AddCharacter(int characterName, Color32 nameColor = default, Color32 textColor = default, Character.GradientType gradientType = Character.GradientType.Name, Color32 nameColorGradient = default, Color32 textColorGradient = default, Color32 colorGradient = default) {
 		if (nameColor.a < 255)
 			nameColor = new Color32(255, 255, 255, 255);
 
@@ -107,28 +104,7 @@ public static class SentenceTools {
 		sentenceManager.Characters.Add(character);
 	}
 
-	public static void AddCharacterState(string characterName, string characterVariant, string stateName, CharacterState.StateType stateType = CharacterState.StateType.SingleLayer, string BaseImagePath = "") {
-		AddCharacterState(characterName, characterVariant, stateName, stateType, BaseImagePath, "", false, Vector2.zero);
-	}
-
-	public static void AddCharacterState(string characterName, string characterVariant, string stateName, CharacterState.StateType stateType, string BaseImagePath, string stateImagePath, bool advanced, Vector2 offset) {
-		foreach (Character character in sentenceManager.Characters) {
-			if (character.CharacterName == characterName) {
-				foreach (CharacterVariant variant in character.characterVariants) {
-
-					Sprite baseImage = GetStateSprite(characterName, BaseImagePath), expressionImage = default;
-
-					if (stateImagePath != "") { expressionImage = GetStateSprite(characterName, stateImagePath); }
-
-					variant.variantStates.Add(new CharacterState(stateName, stateType, baseImage, expressionImage, advanced, offset));
-				}
-			}
-		}
-	}
-
 	public static string[] GetChapterNames() {
-		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
-
 		List<string> list = new List<string> { "None" };
 
 		foreach (var chapter in GetSelectedLanguagePack().chapters) {
@@ -139,8 +115,6 @@ public static class SentenceTools {
 	}
 
 	public static string[] GetCharacterNames() {
-		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
-
 		string[] list = new string[0];
 		foreach (var character in GetSelectedLanguagePack().characters) {
 			Array.Resize(ref list, list.Length + 1);
@@ -167,9 +141,7 @@ public static class SentenceTools {
 		return list.ToArray();
 	}
 
-	public static string[] GetCharacterVariants(string CharacterName) {
-		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
-
+	public static string[] GetCharacterVariants(int CharacterName) {
 		List<string> list = new List<string>();
 		foreach (Character character in sentenceManager.Characters) {
 			if (character.CharacterName == CharacterName) {
@@ -181,18 +153,12 @@ public static class SentenceTools {
 		return list.ToArray();
 	}
 
-	public static string[] GetCharacterStates(string CharacterName, string variantName) {
-		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
-
+	public static string[] GetCharacterStates(int CharacterName, string variantName) {
 		List<string> list = new List<string>();
-		foreach (Character character in sentenceManager.Characters) {
-			if (character.CharacterName == CharacterName) {
-				foreach (CharacterVariant variant in character.characterVariants) {
-					if (variant.VariantName == variantName) {
-						foreach (CharacterState state in variant.variantStates) {
-							list.Add(state.StateName);
-						}
-					}
+		foreach (CharacterVariant variant in sentenceManager.Characters[CharacterName].characterVariants) {
+			if (variant.VariantName == variantName) {
+				foreach (CharacterState state in variant.variantStates) {
+					list.Add(state.StateName);
 				}
 			}
 		}

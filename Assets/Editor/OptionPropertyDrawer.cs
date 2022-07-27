@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -31,4 +31,4 @@ public class OptionPropertyDrawer : PropertyDrawer {
 		return 18 + CustomInspectorUtility.GetPropertyHeight(property, InspectorVariables);
 	}
 }
-#endif
+#endif*/

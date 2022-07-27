@@ -9,10 +9,10 @@ public class CharacterManager : MonoBehaviour {
 
 	// private methods
 	private Dictionary<int, CharacterData> CharactersInScene = new Dictionary<int, CharacterData>();
-	public static SentenceManager sentenceManager = null;
+	public static SentenceManager sentenceManager => MainManager.sentenceData;
 
 	void Awake() {
-		sentenceManager = FindObjectOfType<DialogueManager>().scripts.sentenceManager;
+		//sentenceManager = FindObjectOfType<DialogueManager>().scripts.sentenceManager;
 
 		LeanTween.reset();
 	}
