@@ -1,45 +1,38 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterManager : MonoBehaviour {
 	public GameObject CharacterArray = null;
-	private Dictionary<string, CharacterData> CharactersInScene = new Dictionary<string, CharacterData>();
-	private CharacterInfo characterInfo = null;
-	private Dictionary<string, Vector2> TempLerpData = new Dictionary<string, Vector2>();
-	private Dictionary<string, Coroutine> enumerators = new Dictionary<string, Coroutine>();
 
-	void Start() {
-		characterInfo = (CharacterInfo)FindObjectOfType(typeof(CharacterInfo));
+	// private methods
+	private Dictionary<int, CharacterData> CharactersInScene = new Dictionary<int, CharacterData>();
+	public static SentenceManager sentenceManager = null;
+
+	void Awake() {
+		sentenceManager = FindObjectOfType<DialogueManager>().scripts.sentenceManager;
+
+		LeanTween.reset();
 	}
 
-	public IEnumerator AddCharacterToScene(string Name, CharacterState state, Vector2 position, bool enterScene = false, Vector2 startingPosition = default, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
+	public async Task AddCharacterToScene(int Name, OnSentenceInit.StartingPlace startPosition, CharacterState state, Vector2 position, bool enterScene = false, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
+		await AddCharacterToScene(Name, startPosition, Vector2.zero, state, position, enterScene, speed, FadeIn, FadeSpeed);
+	}
+
+	public async Task AddCharacterToScene(int Name, OnSentenceInit.StartingPlace startPosition, Vector2 customsStartPosition, CharacterState state, Vector2 position, bool enterScene = false, float speed = 0f, bool FadeIn = false, float FadeSpeed = 0.5f) {
 		if (CharacterArray == null) {
 			Debug.LogError("No Character array gameObject found.");
-			yield break;
+			return;
 		}
 
 		CharactersInScene.TryGetValue(Name, out CharacterData tempchar);
 
 		if (tempchar != null) {
 			Debug.LogError("Character(" + Name + ") is already in the scene.");
-			yield break;
+			return;
 		}
-
-		int index = 0;
-
-		foreach (Character temp in characterInfo.Characters) {
-			if (temp.CharacterName == Name)
-				index = Array.IndexOf(characterInfo.Characters, temp);
-		}
-
-		position = GetPosition(position);
-
-		characterInfo.Characters[index].CharacterOnScene = true;
-		characterInfo.Characters[index].CharacterPosition = position;
-		characterInfo.Characters[index].CurrentState = state;
 
 		CharacterData characterData = new CharacterData();
 
@@ -51,261 +44,117 @@ public class CharacterManager : MonoBehaviour {
 		character.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
 
 		character.AddComponent<Image>();
-		character.GetComponent<Image>().sprite = state.StateImage;
+		character.GetComponent<Image>().sprite = state.BaseLayer;
 		character.GetComponent<Image>().SetNativeSize();
 		Destroy(character.GetComponent<Image>());
 
-		GameObject baseLayer = new GameObject();
-
-		baseLayer.transform.SetParent(character.transform);
-
-		baseLayer.AddComponent<RectTransform>();
-		baseLayer.AddComponent<Image>();
-
-		baseLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
-		baseLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
-		baseLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-
-
-		character.name = Name;
-		switch (state.stateType) {
-			case CharacterState.StateType.SingleLayer: {
-					baseLayer.GetComponent<Image>().sprite = state.StateImage;
-					break;
-				}
-			case CharacterState.StateType.MultiLayer: {
-					if (state.Advanced) {
-						GameObject expressionLayer = new GameObject();
-
-						expressionLayer.transform.SetParent(character.transform);
-
-						expressionLayer.AddComponent<RectTransform>();
-						expressionLayer.AddComponent<Image>();
-
-						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-
-						character.GetComponent<Image>().sprite = state.BaseImage;
-						character.GetComponent<Image>().SetNativeSize();
-
-						Destroy(character.GetComponent<Image>());
-
-						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-
-						expressionLayer.GetComponent<Image>().SetNativeSize();
-
-						expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
-
-						characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
-					} else {
-						GameObject expressionLayer = new GameObject();
-
-						expressionLayer.transform.SetParent(character.transform);
-
-						expressionLayer.AddComponent<RectTransform>();
-						expressionLayer.AddComponent<Image>();
-
-						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-
-						expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-
-						expressionLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
-						expressionLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
-						expressionLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-
-						characterData.ExpressionLayer = expressionLayer.GetComponent<Image>();
-					}
-					break;
-				}
-		}
-
 		characterData.characterGO = character;
-		characterData.BaseLayer = baseLayer.GetComponent<Image>();
 
-		if (FadeIn)
-			StartCoroutine(FadeInCharacter(state, characterData, FadeSpeed));
+		character.name = SentenceTools.GetSelectedLanguagePack().characters[Name].CharacterName;
+
+		characterData.CreateSprites(state, out Image baseLayer, out Image expressionLayer);
+
+		position = GetPosition(position);
+
+		characterData.BaseLayer = baseLayer;
 
 		character.transform.SetParent(CharacterArray.transform);
 
-		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacter(Name, state).CharacterScale.x, 1 * GetCharacter(Name, state).CharacterScale.y, 1);
+		character.GetComponent<RectTransform>().localScale = new Vector3(1 * GetCharacter(Name).CharacterScale.x, 1 * GetCharacter(Name).CharacterScale.y, 1);
 
 		CharactersInScene.Add(Name, characterData);
 
-		if (enterScene) {
-			Coroutine coroutine = StartCoroutine(Lerp(startingPosition, position, speed, characterData));
-			enumerators.Add(Name, coroutine);
+		Vector2 startingPosition = new Vector2(0, 0);
 
-			yield return coroutine;
-		} else {
-			character.transform.GetComponent<RectTransform>().position = position;
-		}
-	}
-
-	public Character GetCharacter(string Name, CharacterState state) {
-		Character temp = new Character();
-
-		foreach (Character character in characterInfo.Characters) {
-			if (character.CharacterName != Name) { continue; }
-			foreach(CharacterVariant variant in character.characterVariants) {
-				foreach (CharacterState characterState in variant.variantStates) {
-					if (characterState == state) {
-						return character;
-					}
-				}
+		switch (startPosition) {
+			case OnSentenceInit.StartingPlace.Left: {
+				startingPosition = new Vector2(0 - baseLayer.rectTransform.rect.width, 0);
+				break;
+			}
+			case OnSentenceInit.StartingPlace.Right: {
+				startingPosition = new Vector2(2560 + baseLayer.rectTransform.rect.width, 0);
+				break;
+			}
+			case OnSentenceInit.StartingPlace.Custom: {
+				startingPosition = customsStartPosition;
+				break;
 			}
 		}
 
-		return temp;
+		character.GetComponent<RectTransform>().anchoredPosition = startingPosition;
+
+		characterData.BaseLayer = baseLayer;
+		if (state.stateType == CharacterState.StateType.MultiLayer)
+			characterData.ExpressionLayer = expressionLayer;
+
+		await characterData.CharacterEnter(position, speed, FadeSpeed, enterScene, FadeIn);
 	}
 
-	public IEnumerator MoveCharacter(string Name, Vector2 position, float speed) {
-		int index = 0;
+	public Character GetCharacter(int Name) {
+		return sentenceManager.Characters[Name];
+	}
 
-		if (!CharactersInScene.TryGetValue(Name, out CharacterData character)) {
+	public async Task MoveCharacter(int index, Vector2 position, float speed) {
+		if (!CharactersInScene.TryGetValue(index, out CharacterData character)) {
 			Debug.LogError("Character is not in the scene");
-			yield break;
+			return;
 		}
 
-		foreach (Character temp in characterInfo.Characters) {
-			if (temp.CharacterName == Name)
-				index = Array.IndexOf(characterInfo.Characters, temp);
-		}
-
-		Vector2 currentPosition = characterInfo.Characters[index].CharacterPosition;
-
-		Coroutine coroutine;
-
-		if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
-			Debug.Log(Name);
-			StopCoroutine(enumerator);
-
-			position = GetPosition(position);
-
-			TempLerpData.TryGetValue(Name, out Vector2 tempPos);
-
-			enumerators.Remove(Name);
-
-			TempLerpData.Remove(Name);
-
-			coroutine = StartCoroutine(Lerp(tempPos, position, speed, character));
-
-			enumerators.Add(Name, coroutine);
-
-			characterInfo.Characters[index].CharacterPosition = position;
-
-			yield return coroutine;
-
-			yield break;
-		}
-
-		currentPosition = GetPosition(currentPosition);
 		position = GetPosition(position);
 
-		characterInfo.Characters[index].CharacterPosition = position;
-
-		coroutine = StartCoroutine(Lerp(currentPosition, position, speed, character));
-
-		enumerators.Add(Name, coroutine);
-
-		yield return coroutine;
+		await character.CharacterMove(position, speed);
 	}
 
-	public IEnumerator ChangeCharacterState(string Name, CharacterState state, bool transition = false, float speed = 0.5f) {
-		CharactersInScene.TryGetValue(Name, out CharacterData character);
+	public async Task ChangeCharacterState(int index, CharacterState state, bool transition = false, float speed = 0.5f) {
+		CharactersInScene.TryGetValue(index, out CharacterData character);
 
 		if (character == null) {
 			Debug.LogError("Character is not in the scene");
-			yield break;
+			return;
 		}
 
 		if (transition) {
-			yield return StartCoroutine(TransitionCharacterState(state, character, speed));
+			await character.CharacterTransition(state, speed);
 		} else {
-			if (character.ExpressionLayer == null) {
-				character.BaseLayer.sprite = state.StateImage;
+			character.characterGO.AddComponent<Image>();
 
-				character.characterGO.AddComponent<Image>();
-				character.characterGO.GetComponent<Image>().sprite = state.StateImage;
-				character.characterGO.GetComponent<Image>().SetNativeSize();
-				Destroy(character.characterGO.GetComponent<Image>());
-			} else {
-				character.BaseLayer.sprite = state.BaseImage;
-				character.ExpressionLayer.sprite = state.StateImage;
+			character.BaseLayer.sprite = state.BaseLayer;
 
-				character.characterGO.AddComponent<Image>();
-				character.characterGO.GetComponent<Image>().sprite = state.StateImage;
-				character.characterGO.GetComponent<Image>().SetNativeSize();
-				Destroy(character.characterGO.GetComponent<Image>());
+			character.characterGO.GetComponent<Image>().sprite = state.BaseLayer;
+
+			if (character.ExpressionLayer != null) {
+				character.ExpressionLayer.sprite = state.ExpressionLayer;
 			}
+
+			character.characterGO.GetComponent<Image>().SetNativeSize();
+			Destroy(character.characterGO.GetComponent<Image>());
 		}
 	}
 
-	public IEnumerator RemoveCharacterFromScene(string Name, Vector2 position, bool exitScene = false, float speed = 0f, bool FadeOut = false, float FadeSpeed = 0.5f) {
-		int index = 0;
-
-		CharactersInScene.TryGetValue(Name, out CharacterData character);
+	public async Task RemoveCharacterFromScene(int index, Vector2 position, bool exitScene = false, float speed = 0f, bool FadeOut = false, float FadeSpeed = 0.5f) {
+		CharactersInScene.TryGetValue(index, out CharacterData character);
 
 		if (character == null) {
 			Debug.LogError("Character is not in the scene");
-			yield break;
+			return;
 		}
 
-		foreach (Character temp in characterInfo.Characters) {
-			if (temp.CharacterName == Name)
-				index = Array.IndexOf(characterInfo.Characters, temp);
-		}
-
-		Vector2 currentPosition = characterInfo.Characters[index].CharacterPosition;
-
-		currentPosition = GetPosition(currentPosition);
 		position = GetPosition(position);
 
-		CharacterState state = characterInfo.Characters[index].CurrentState;
-
-		characterInfo.Characters[index].CharacterOnScene = false;
-		characterInfo.Characters[index].CharacterPosition = position;
-		characterInfo.Characters[index].CurrentState = null;
-
-
-
-		if (exitScene) {
-			if (enumerators.TryGetValue(Name, out Coroutine enumerator) && enumerator != null) {
-				Debug.Log(Name);
-				StopCoroutine(enumerator);
-
-				position = GetPosition(position);
-
-				TempLerpData.TryGetValue(Name, out Vector2 tempPos);
-
-				enumerators.Remove(Name);
-
-				TempLerpData.Remove(Name);
-
-				enumerators.Add(Name, StartCoroutine(Lerp(tempPos, position, speed, character)));
-
-				characterInfo.Characters[index].CharacterPosition = position;
-			} else
-				StartCoroutine(Lerp(currentPosition, position, speed, character));
-		}
-
-		CharactersInScene.Remove(Name);
-
-		if (FadeOut)
-			yield return StartCoroutine(FadeOutCharacter(state, character, FadeSpeed, true));
-		else
-			StartCoroutine(FadeOutCharacter(state, character, 0f, true));
+		await character.CharacterExit(position, speed, FadeSpeed, exitScene, FadeOut, true);
 	}
 
-	public void SetCharacterIndex(string name, int index) {
-		if(!CharactersInScene.TryGetValue(name, out CharacterData character)) {
+	public void SetCharacterIndex(int name, int index) {
+		if (!CharactersInScene.TryGetValue(name, out CharacterData character)) {
 			Debug.LogError("Character is not in scene");
 			return;
 		}
 
-		if(index >= CharactersInScene.Count) {
+		if (index >= CharactersInScene.Count) {
 			index = CharactersInScene.Count - 1;
 		}
 
-		if(index < 0) {
+		if (index < 0) {
 			index = 0;
 		}
 
@@ -316,19 +165,15 @@ public class CharacterManager : MonoBehaviour {
 
 	public void RemoveAllCharactersFromScene() {
 		StopAllCoroutines();
-		foreach(Character character in characterInfo.Characters) {
-			if(character.CharacterOnScene) {
-				StartCoroutine(RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition));
-				Debug.Log(character.CharacterName);
-			}
-		}
+		foreach (var value in CharactersInScene.Keys)
+			_ = RemoveCharacterFromScene(value, Vector2.zero);
 	}
 
-	public bool CharacterInScene(string name) {
-		return CharactersInScene.TryGetValue(name, out CharacterData data);
+	public bool CharacterInScene(int index) {
+		return CharactersInScene.TryGetValue(index, out _);
 	}
 
-	public Vector2 GetPosition(Vector2 position) {
+	public static Vector2 GetPosition(Vector2 position) {
 		position.x /= 2650;
 		position.y /= 1440;
 
@@ -337,309 +182,6 @@ public class CharacterManager : MonoBehaviour {
 
 		return position;
 	}
-
-	IEnumerator Lerp(Vector2 startingPos, Vector2 Pos, float lerpDuration, CharacterData character) {
-		float timeElapsed = 0;
-
-		string name = character.characterGO.name;
-
-		TempLerpData.Add(name, new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration)));
-
-		while (timeElapsed < lerpDuration) {
-			if (character.characterGO == null) {
-				enumerators.Remove(name);
-				TempLerpData.Remove(name); 
-				yield break; 
-			}
-
-			float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
-
-			character.characterGO.transform.GetComponent<RectTransform>().position = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, lerpProgress), Mathf.Lerp(startingPos.y, Pos.y, lerpProgress));
-
-			if (TempLerpData.TryGetValue(character.characterGO.name, out Vector2 tempPos))
-				TempLerpData[character.characterGO.name] = new Vector2(Mathf.Lerp(startingPos.x, Pos.x, timeElapsed / lerpDuration), Mathf.Lerp(startingPos.y, Pos.y, timeElapsed / lerpDuration));
-
-
-			timeElapsed += Time.deltaTime;
-
-			yield return null;
-		}
-		character.characterGO.transform.GetComponent<RectTransform>().position = Pos;
-		enumerators.Remove(name);
-		TempLerpData.Remove(name);
-	}
-
-	IEnumerator FadeInCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
-		float timeElapsed = 0;
-
-		while (timeElapsed < lerpDuration) {
-			switch (state.stateType) {
-				case CharacterState.StateType.SingleLayer: {
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
-						break;
-					}
-				case CharacterState.StateType.MultiLayer: {
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
-						character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
-						break;
-					}
-			}
-
-			timeElapsed += Time.deltaTime;
-
-			yield return null;
-		}
-		switch (state.stateType) {
-			case CharacterState.StateType.SingleLayer: {
-					character.BaseLayer.color = new Color32(255, 255, 255, 255);
-					break;
-				}
-			case CharacterState.StateType.MultiLayer: {
-					character.BaseLayer.color = new Color32(255, 255, 255, 255);
-					character.ExpressionLayer.color = new Color32(255, 255, 255, 255);
-					break;
-				}
-		}
-	}
-
-	IEnumerator TransitionCharacterState(CharacterState state, CharacterData character, float lerpDuration = 0.5f) {
-		switch (state.stateType) {
-			case CharacterState.StateType.SingleLayer: {
-					float timeElapsed = 0;
-					GameObject baselayer = character.BaseLayer.gameObject;
-
-					GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
-
-					baseLayer.transform.SetParent(character.characterGO.transform);
-
-					baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
-					baseLayer.GetComponent<Image>().sprite = state.StateImage;
-
-					character.BaseLayer = baseLayer.GetComponent<Image>();
-
-					character.BaseLayer.SetNativeSize();
-
-					character.BaseLayer.rectTransform.pivot = Vector2.zero;
-					character.BaseLayer.rectTransform.anchorMin = Vector2.zero;
-					character.BaseLayer.rectTransform.anchorMax = Vector2.one;
-					character.BaseLayer.rectTransform.localPosition = Vector2.zero;
-					character.BaseLayer.rectTransform.sizeDelta = Vector2.one;
-
-					character.BaseLayer.color = new Color32(255, 255, 255, 0);
-
-					while (timeElapsed < lerpDuration) {
-						baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-
-						float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
-
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
-
-						timeElapsed += Time.deltaTime;
-
-						yield return null;
-					}
-
-					Destroy(baselayer);
-
-					break;
-				}
-			case CharacterState.StateType.MultiLayer: {
-					if (character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
-						float timeElapsed = 0;
-						GameObject baselayer = character.BaseLayer.gameObject;
-
-						GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
-
-						baseLayer.transform.SetParent(character.characterGO.transform);
-
-						baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
-						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-
-						character.BaseLayer = baseLayer.GetComponent<Image>();
-
-						character.BaseLayer.color = new Color32(255, 255, 255, 0);
-
-						GameObject expressionlayer = character.ExpressionLayer.gameObject;
-						GameObject expressionLayer;
-
-						if (state.Advanced) {
-							expressionLayer = new GameObject();
-
-							expressionLayer.transform.SetParent(character.characterGO.transform);
-
-							expressionLayer.AddComponent<RectTransform>();
-							expressionLayer.AddComponent<Image>();
-
-							baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-
-							if (!character.characterGO.TryGetComponent(out Image img))
-								img = character.characterGO.AddComponent<Image>();
-							img.sprite = state.BaseImage;
-							img.SetNativeSize();
-
-							Destroy(img);
-
-							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
-
-							expressionLayer.GetComponent<Image>().SetNativeSize();
-
-							expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
-
-							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
-						} else { 
-							expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
-
-							expressionLayer.transform.SetParent(character.characterGO.transform);
-
-							expressionLayer.GetComponent<RectTransform>().sizeDelta = expressionLayer.GetComponent<RectTransform>().sizeDelta;
-							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-
-							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
-
-							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
-						}
-
-
-						while (timeElapsed < lerpDuration) {
-
-							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
-
-							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-
-							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
-
-
-							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-
-							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
-
-							timeElapsed += Time.deltaTime;
-
-							yield return null;
-						}
-
-						Destroy(baselayer);
-						Destroy(expressionlayer);
-						break;
-					}
-					if (character.BaseLayer.sprite != state.BaseImage && character.ExpressionLayer.sprite == state.StateImage) {
-						float timeElapsed = 0;
-						GameObject baselayer = character.BaseLayer.gameObject;
-
-						GameObject baseLayer = Instantiate(baselayer, character.characterGO.transform);
-
-						baseLayer.transform.SetParent(character.characterGO.transform);
-
-						baseLayer.GetComponent<RectTransform>().sizeDelta = baselayer.GetComponent<RectTransform>().sizeDelta;
-						baseLayer.GetComponent<Image>().sprite = state.BaseImage;
-
-						character.BaseLayer = baseLayer.GetComponent<Image>();
-
-						character.BaseLayer.color = new Color32(255, 255, 255, 0);
-
-						while (timeElapsed < lerpDuration) {
-
-							baselayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-
-							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
-
-							character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
-
-							timeElapsed += Time.deltaTime;
-
-							yield return null;
-						}
-
-						Destroy(baselayer);
-					}
-					if (character.BaseLayer.sprite == state.BaseImage && character.ExpressionLayer.sprite != state.StateImage) {
-						float timeElapsed = 0;
-						GameObject expressionlayer = character.ExpressionLayer.gameObject;
-						GameObject expressionLayer;
-
-						if (state.Advanced) {
-							expressionLayer = new GameObject();
-
-							expressionLayer.transform.SetParent(character.characterGO.transform);
-
-							expressionLayer.AddComponent<RectTransform>();
-							expressionLayer.AddComponent<Image>();
-
-							if(!character.characterGO.TryGetComponent(out Image img))
-								 img = character.characterGO.AddComponent<Image>();
-							img.sprite = state.BaseImage;
-							img.SetNativeSize();
-
-							Destroy(img);
-
-							expressionLayer.GetComponent<RectTransform>().localScale = Vector3.one;
-
-							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-							character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
-
-							expressionLayer.GetComponent<Image>().SetNativeSize();
-
-							expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.EpressionLayerPosition;
-
-							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
-						} else {
-							expressionLayer = Instantiate(expressionlayer, character.characterGO.transform);
-
-							expressionLayer.transform.SetParent(character.characterGO.transform);
-
-							expressionLayer.GetComponent<RectTransform>().sizeDelta = Vector2.one;
-							expressionLayer.GetComponent<Image>().sprite = state.StateImage;
-
-							character.ExpressionLayer = expressionLayer.GetComponent<Image>();
-						}
-
-						character.ExpressionLayer.color = new Color32(255, 255, 255, 0);
-
-						while (timeElapsed < lerpDuration) {
-
-							expressionlayer.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-
-							float lerpProgress = Mathf.Clamp01(timeElapsed / lerpDuration);
-
-							character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, lerpProgress));
-
-							timeElapsed += Time.deltaTime;
-
-							yield return null;
-						}
-						Destroy(expressionlayer);
-					}
-					break;
-				}
-		}
-	}
-
-	IEnumerator FadeOutCharacter(CharacterState state, CharacterData character, float lerpDuration = 0.5f, bool destroy = false) {
-		float timeElapsed = 0;
-
-		while (timeElapsed < lerpDuration) {
-			switch (state.stateType) {
-				case CharacterState.StateType.SingleLayer: {
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						break;
-					}
-				case CharacterState.StateType.MultiLayer: {
-						character.BaseLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						character.ExpressionLayer.color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
-						break;
-					}
-			}
-
-			timeElapsed += Time.deltaTime;
-
-			yield return null;
-		}
-
-		if (destroy) {
-			Destroy(character.characterGO);
-		}
-	}
 }
 
 [Serializable]
@@ -647,4 +189,211 @@ public class CharacterData {
 	public GameObject characterGO;
 	public Image BaseLayer;
 	public Image ExpressionLayer;
+
+	private LTDescr MoveAnim;
+	private LTDescr BaseAnim;
+	private LTDescr ExpressionAnim;
+
+	public async Task CharacterEnter(Vector2 Pos, float EnterSpeed, float FadeSpeed, bool enterScene, bool fadeIn) {
+		if (enterScene)
+			_ = CharacterMove(Pos, EnterSpeed);
+
+		if (fadeIn) {
+			BaseLayer.color = SentenceTools.SetColorAlpha(BaseLayer.color, 0);
+
+			if (ExpressionLayer != null)
+				ExpressionLayer.color = SentenceTools.SetColorAlpha(ExpressionLayer.color, 0);
+
+			_ = CharacterFade(1, FadeSpeed);
+		}
+
+
+		while (MoveAnim != null || BaseAnim != null) {
+			await Task.Delay(1);
+		}
+
+		return;
+	}
+
+	public async Task CharacterExit(Vector2 Pos, float ExitSpeed, float FadeSpeed, bool ExitScene, bool fadeOut, bool destroy = false) {
+		if (ExitScene)
+			_ = CharacterMove(Pos, ExitSpeed);
+
+		if (fadeOut) {
+			_ = CharacterFade(0, FadeSpeed);
+		}
+
+
+		while (MoveAnim != null || BaseAnim != null) {
+			await Task.Delay(1);
+		}
+
+		if (destroy) {
+			UnityEngine.Object.Destroy(characterGO);
+		}
+
+		return;
+	}
+
+	public async Task CharacterTransition(CharacterState state, float transitionSpeed) {
+		float fadeOutMultiplier = 1.7f;
+
+		if (BaseLayer.sprite == state.BaseLayer && ExpressionLayer != null && ExpressionLayer.sprite == state.ExpressionLayer)
+			return;
+
+		if (BaseLayer.sprite != state.BaseLayer)
+			_ = FadeBase(0, transitionSpeed * fadeOutMultiplier);
+
+		if (ExpressionLayer != null && ExpressionLayer.sprite != state.ExpressionLayer)
+			_ = FadeExpression(0, transitionSpeed * fadeOutMultiplier);
+
+		GameObject baLayer = BaseLayer.gameObject;
+		GameObject exLayer = ExpressionLayer != null ? ExpressionLayer.gameObject : null;
+
+		CreateSprites(state, out BaseLayer, out ExpressionLayer);
+
+		BaseLayer.color = SentenceTools.SetColorAlpha(BaseLayer.color, 0);
+
+		if (ExpressionLayer != null)
+			ExpressionLayer.color = SentenceTools.SetColorAlpha(ExpressionLayer.color, 0);
+
+		if (BaseLayer.sprite != state.BaseLayer)
+			_ = FadeBase(1, transitionSpeed);
+
+		if (state.stateType == CharacterState.StateType.MultiLayer && ExpressionLayer.sprite != state.ExpressionLayer)
+			_ = FadeExpression(1, transitionSpeed);
+
+		while (BaseAnim != null || ExpressionAnim != null) {
+			await Task.Delay(1);
+		}
+
+		UnityEngine.Object.Destroy(baLayer);
+		if (exLayer != null)
+			UnityEngine.Object.Destroy(exLayer);
+
+		return;
+	}
+
+	public async Task CharacterMove(Vector2 Pos, float MoveSpeed) {
+		MoveAnim = LeanTween.move(characterGO.GetComponent<RectTransform>(), Pos, MoveSpeed);
+
+		while (LeanTween.isTweening(MoveAnim.id)) {
+			await Task.Delay(1);
+		}
+
+		MoveAnim = null;
+
+		return;
+	}
+
+	public async Task TestAnim() {
+		LTDescr anim = LeanTween.move(characterGO.GetComponent<RectTransform>(), CharacterManager.GetPosition(new Vector2(2000, 0)), 10f);
+
+		while (characterGO.GetComponent<RectTransform>().anchoredPosition.x < 500) {
+			await Task.Delay(1);
+		}
+
+		LeanTween.cancel(anim.id);
+	}
+
+	public async Task CharacterFade(float to, float fadeSpeed, bool overrideCancel = false) {
+		if (!overrideCancel && (BaseAnim != null || ExpressionAnim != null)) {
+			LeanTween.cancel(BaseAnim.id);
+			LeanTween.cancel(ExpressionAnim.id);
+		}
+
+		_ = FadeBase(to, fadeSpeed);
+
+		if (ExpressionLayer != null) {
+			_ = FadeExpression(to, fadeSpeed);
+		}
+
+		while (BaseAnim != null || ExpressionAnim != null) {
+			await Task.Delay(1);
+		}
+
+		return;
+	}
+
+	public async Task FadeBase(float to, float fadeSpeed) {
+		BaseAnim = LeanTween.alpha(BaseLayer.rectTransform, to, fadeSpeed);
+
+		while (LeanTween.isTweening(BaseAnim.id))
+			await Task.Delay(1);
+
+		BaseAnim = null;
+	}
+
+	public async Task FadeExpression(float to, float fadeSpeed) {
+		ExpressionAnim = LeanTween.alpha(BaseLayer.gameObject, to, fadeSpeed);
+
+		while (LeanTween.isTweening(ExpressionAnim.id))
+			await Task.Delay(1);
+
+		ExpressionAnim = null;
+	}
+
+	public void CreateSprites(CharacterState state, out Image baLayer, out Image exLayer) {
+		GameObject baseLayer = new GameObject();
+
+		baseLayer.name = "Base Layer";
+
+		baseLayer.transform.SetParent(characterGO.transform);
+
+		baseLayer.AddComponent<RectTransform>();
+		baseLayer.AddComponent<Image>();
+
+		baseLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
+		baseLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
+		baseLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+
+		baseLayer.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+		baseLayer.GetComponent<RectTransform>().localScale = Vector3.one;
+
+		baLayer = baseLayer.GetComponent<Image>();
+
+		exLayer = baLayer;
+
+		baseLayer.GetComponent<Image>().sprite = state.BaseLayer;
+
+		switch (state.stateType) {
+			case CharacterState.StateType.MultiLayer: {
+				GameObject expressionLayer = new GameObject();
+
+				expressionLayer.name = "Expression Layer";
+
+				expressionLayer.transform.SetParent(characterGO.transform);
+
+				expressionLayer.AddComponent<RectTransform>();
+				expressionLayer.AddComponent<Image>();
+
+				expressionLayer.GetComponent<Image>().sprite = state.ExpressionLayer;
+
+				expressionLayer.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
+				expressionLayer.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
+				expressionLayer.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+
+				expressionLayer.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+				expressionLayer.GetComponent<RectTransform>().localScale = Vector3.one;
+
+				if (state.Advanced) {
+					characterGO.GetComponent<Image>().sprite = state.BaseLayer;
+					characterGO.GetComponent<Image>().SetNativeSize();
+
+					UnityEngine.Object.Destroy(characterGO.GetComponent<Image>());
+
+					baseLayer.GetComponent<Image>().SetNativeSize();
+
+					baseLayer.GetComponent<RectTransform>().anchoredPosition = state.BaseLayerPosition;
+
+					expressionLayer.GetComponent<Image>().SetNativeSize();
+
+					expressionLayer.GetComponent<RectTransform>().anchoredPosition = state.ExpressionLayerPosition;
+				}
+
+				exLayer = expressionLayer.GetComponent<Image>();
+				break;
+			}
+		}
+	}
 }

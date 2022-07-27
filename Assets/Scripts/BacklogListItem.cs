@@ -25,7 +25,9 @@ public class BacklogListItem : MonoBehaviour
 	}
 
 	void Update() {
-		foreach(Character character in MainScript.scripts.CharacterInfoScript.Characters) {
+		if(MainScript == null) MainScript = (DialogueManager)FindObjectOfType(typeof(DialogueManager));
+
+		foreach (Character character in MainScript.scripts.CharacterInfoScript.Characters) {
 			if (Character.CharacterName == character.CharacterName)
 				Character = character;
 		}
@@ -39,8 +41,8 @@ public class BacklogListItem : MonoBehaviour
 		sentence = itemSentence;
 		VoiceClip = itemVoiceClip;
 		this.gameObject.name = "" + ID;
-		NameText.text = Name;
-		SentenceText.text = sentence;
+		if (NameText != null) NameText.text = Name;
+		if (SentenceText != null) SentenceText.text = sentence;
 		Character = character;
 
 		UpdateColor(character);
@@ -52,11 +54,11 @@ public class BacklogListItem : MonoBehaviour
 			}
 		}
 
-		this.transform.localScale = new Vector3(1,1,1);
+		transform.localScale = new Vector3(1,1,1);
 	}
 
 	public void Remove() {
-		Destroy(this.gameObject);
+		Destroy(gameObject);
 	}
 
 	public void Jumpto() {
@@ -78,30 +80,33 @@ public class BacklogListItem : MonoBehaviour
 			textColor = character.Color;
 		}
 
+		Color32 nameGradientColor = character.NameGradientColor;
+		Color32 textGradientColor = character.TextGradientColor;
+
+		if (!character.UseSeperateColors) {
+			nameGradientColor = character.GradientColor;
+			textGradientColor = character.GradientColor;
+		}
+
 		switch (character.gradientType) {
 			case Character.GradientType.None: {
-					NameText.colorGradient = new VertexGradient(nameColor);
-					SentenceText.colorGradient = new VertexGradient(textColor);
+					if (NameText != null) NameText.colorGradient = new VertexGradient(nameColor);
+					if (SentenceText != null) SentenceText.colorGradient = new VertexGradient(textColor);
 					break;
 				}
 			case Character.GradientType.Name: {
-					NameText.colorGradient = new VertexGradient(nameColor, nameColor, character.NameGradientColor, character.NameGradientColor);
-					SentenceText.colorGradient = new VertexGradient(textColor, textColor, textColor, textColor);
+					if (NameText != null) NameText.colorGradient = new VertexGradient(nameColor, nameColor, character.NameGradientColor, character.NameGradientColor);
+					if (SentenceText != null) SentenceText.colorGradient = new VertexGradient(textColor, textColor, textColor, textColor);
 					break;
 				}
 			case Character.GradientType.Text: {
-					NameText.colorGradient = new VertexGradient(nameColor, nameColor, nameColor, nameColor);
-					SentenceText.colorGradient = new VertexGradient(textColor, textColor, character.TextGradientColor, character.TextGradientColor);
+					if (NameText != null) NameText.colorGradient = new VertexGradient(nameColor, nameColor, nameColor, nameColor);
+					if (SentenceText != null) SentenceText.colorGradient = new VertexGradient(textColor, textColor, character.TextGradientColor, character.TextGradientColor);
 					break;
 				}
 			case Character.GradientType.Both: {
-					if (character.UseSeperateGradientColors) { 
-						NameText.colorGradient = new VertexGradient(nameColor, nameColor, character.NameGradientColor, character.NameGradientColor);
-						SentenceText.colorGradient = new VertexGradient(textColor, textColor, character.TextGradientColor, character.TextGradientColor);
-					} else {
-						NameText.colorGradient = new VertexGradient(nameColor, nameColor, character.GradientColor, character.GradientColor);
-						SentenceText.colorGradient = new VertexGradient(textColor, textColor, character.GradientColor, character.GradientColor);
-					}     
+					if (NameText != null) NameText.colorGradient = new VertexGradient(nameColor, nameColor, nameGradientColor, nameGradientColor);
+					if (SentenceText != null) SentenceText.colorGradient = new VertexGradient(textColor, textColor, textGradientColor, textGradientColor);    
 					break;
 				}
 		}

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,18 +11,37 @@ public class CGManager : MonoBehaviour {
 
 	public Artwork[] CGList;
 
-	public void ShowBG(int BG_ID, float fadeSpeed = 0.7f) {
-		if (BG_ID == -1) { StartCoroutine(TransitionArtwork(BGDisplay, null, fadeSpeed)); return; }
-		if (BGDisplay.childCount > 0) if (BGDisplay.GetChild(BGDisplay.childCount - 1).GetComponent<Image>().sprite == BGList[BG_ID].artworkImage) { return; }
-		StartCoroutine(TransitionArtwork(BGDisplay, BGList[BG_ID].artworkImage, fadeSpeed));
-		BGList[BG_ID].artworkViewed = true;
+	public async Task ShowBG(int BG_ID, bool transition = false, float fadeSpeed = 0.7f) {
+		if (BG_ID == -1) {
+			if (transition)
+				await ArtworkTransition(BGDisplay, null, fadeSpeed);
+			else
+				CreateArtworkObject(BGDisplay, null);
+			return;
+		}
+
+		if (!transition) { CreateArtworkObject(BGDisplay, BGList[BG_ID].artworkImage); return; }
+
+		if (BGDisplay.childCount > 0)
+			if (BGDisplay.GetChild(BGDisplay.childCount - 1).GetComponent<Image>().sprite == BGList[BG_ID].artworkImage) { return; }
+		await ArtworkTransition(BGDisplay, BGList[BG_ID].artworkImage, fadeSpeed);
 	}
 
-	public void ShowCG(int CG_ID, float fadeSpeed = 0.7f) {
-		if (CG_ID == -1) { StartCoroutine(TransitionArtwork(CGDisplay, null, fadeSpeed)); return; }
-		if (CGDisplay.childCount > 0) if (CGDisplay.GetChild(CGDisplay.childCount - 1).GetComponent<Image>().sprite == CGList[CG_ID].artworkImage) { return; }
-		StartCoroutine(TransitionArtwork(CGDisplay, CGList[CG_ID].artworkImage, fadeSpeed));
-		CGList[CG_ID].artworkViewed = true;
+	public async Task ShowCG(int CG_ID, bool transition = false, float fadeSpeed = 0.7f) {
+		if (CG_ID == -1) {
+			if (transition)
+				await ArtworkTransition(CGDisplay, null, fadeSpeed);
+			else
+				CreateArtworkObject(CGDisplay, null);
+			return; 
+		}
+
+		if (!transition) { CreateArtworkObject(CGDisplay, CGList[CG_ID].artworkImage); return; }
+
+		if (CGDisplay.childCount > 0) 
+			if (CGDisplay.GetChild(CGDisplay.childCount - 1).GetComponent<Image>().sprite == CGList[CG_ID].artworkImage) { return; }
+
+		await ArtworkTransition(CGDisplay, CGList[CG_ID].artworkImage, fadeSpeed);
 	}
 
 	public GameObject CreateArtworkObject(Transform list, Sprite Artwork) {
@@ -37,57 +57,45 @@ public class CGManager : MonoBehaviour {
 		tr.anchorMax = new Vector2(1, 1);
 		tr.anchoredPosition = new Vector2(0, 0);
 		tr.sizeDelta = new Vector2(1, 1);
+		tr.SetAsLastSibling();
 		return art;
 	}
 
-	IEnumerator TransitionArtwork(Transform list, Sprite Artwork, float lerpDuration) {
-		float timeElapsed = 0;
+	public async Task ArtworkTransition(Transform List, Sprite Artwork, float transitionSpeed) {
+		float fadeOutMultiplier = 1.7f;
 
-		if(Artwork == null) {
-			GameObject artworkObject = list.GetChild(list.childCount - 1).gameObject;
+		Task oldFade = null, newFade;
 
-			artworkObject.GetComponent<Image>().color = new Color32(255, 255, 255, 0);
-			artworkObject.GetComponent<Image>().sprite = Artwork;
+		if (List.childCount > 0) {
+			RectTransform artworkObject = List.GetChild(List.childCount - 1).GetComponent<RectTransform>();
 
-			while (timeElapsed <= lerpDuration) {
-				artworkObject.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
+			oldFade = FadeArtwork(artworkObject, 0, transitionSpeed * fadeOutMultiplier);
 
-				timeElapsed += Time.deltaTime;
-
-				yield return null;
-			}
-
-			Destroy(artworkObject);
 		}
 
-		GameObject temp;
-		if (list.childCount > 0) temp = Instantiate(list.GetChild(0).gameObject, list);
-		else temp = CreateArtworkObject(list, Artwork);
+		Image newArtwork = CreateArtworkObject(List, Artwork).GetComponent<Image>();
 
-		temp.transform.SetAsLastSibling();
-		temp.name = Artwork.name;
+		newArtwork.color = SentenceTools.SetColorAlpha(newArtwork.color, 0);
 
-		temp.GetComponent<Image>().color = new Color32(255, 255, 255, 0);
-		temp.GetComponent<Image>().sprite = Artwork;
+		newFade = FadeArtwork(newArtwork.rectTransform, 1, transitionSpeed);
 
-		while (timeElapsed <= lerpDuration) {
-			if(list.childCount > 1) list.GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(255, 0, timeElapsed / lerpDuration));
+		if (oldFade == null)
+			oldFade = newFade;
 
-			temp.GetComponent<Image>().color = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, timeElapsed / lerpDuration));
-
-			timeElapsed += Time.deltaTime;
-
-			yield return null;
+		while (!oldFade.IsCompleted || !newFade.IsCompleted) {
+			await Task.Delay(1);
 		}
 
-		if (list.childCount > 1) Destroy(list.GetChild(0).gameObject);
+		return;
 	}
-}
 
-[System.Serializable]
-public class Artwork {
-	public string Name;
-	public Sprite artworkImage;
-	public bool artworkViewed;
+	public async Task FadeArtwork(RectTransform artwork, float to, float fadeSpeed, bool destroy = false) {
+		LTDescr anim = LeanTween.alpha(artwork, to, fadeSpeed);
 
+		while (LeanTween.isTweening(anim.id))
+			await Task.Delay(1);
+
+		if (destroy)
+			Destroy(artwork);
+	}
 }

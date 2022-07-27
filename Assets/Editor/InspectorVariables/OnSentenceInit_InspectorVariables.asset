@@ -110,7 +110,7 @@ MonoBehaviour:
     variableType: 5
     displayType: 0
     customVariableDisplay: 0
-    ModifierOptions: 0
+    ModifierOptions: 1
     Bounds: {x: 0, y: 0}
     PopupOptions: 
     ChildClassVariables: {fileID: 0}
@@ -225,11 +225,11 @@ MonoBehaviour:
       verificationModifier: 2
   - variableName: CharacterIndex
     variableType: 0
-    displayType: 0
-    customVariableDisplay: 0
-    ModifierOptions: 0
-    Bounds: {x: 0, y: 0}
-    PopupOptions: 
+    displayType: 1
+    customVariableDisplay: 2
+    ModifierOptions: 1
+    Bounds: {x: -50, y: 50}
+    PopupOptions: 2,1,5,4,3
     ChildClassVariables: {fileID: 0}
     offset: 2
     witdh: -1

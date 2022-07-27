@@ -194,25 +194,33 @@ public class SaveLoadSystem : MonoBehaviour {
 	}
 
 	public void ManageCharacterInfo(List<CharacterSaveData> characters) {
-		foreach (Character character in FindObjectOfType<CharacterInfo>().Characters) {
+		foreach (Character character in FindObjectOfType<DialogueManager>().scripts.sentenceManager.Characters) {
 			if (character.CharacterOnScene) {
-				FindObjectOfType<CharacterManager>().RemoveCharacterFromScene(character.CharacterName, character.CharacterPosition);
+				_ = FindObjectOfType<CharacterManager>().RemoveCharacterFromScene(character.CharacterName, Vector2.zero);
 			}
 		}
 
 		foreach (CharacterSaveData character in characters) {
 			if (character.CharacterOnScene) {
-				FindObjectOfType<CharacterManager>().AddCharacterToScene(character.CharacterName, dialogueManager.GetCharacterState(character.CharacterName, character.stateName), new Vector2(character.CharacterPosition[0], character.CharacterPosition[1]));
+				_ = FindObjectOfType<CharacterManager>().AddCharacterToScene(character.CharacterName, OnSentenceInit.StartingPlace.Left, dialogueManager.GetCharacterState(character.CharacterName, character.variantName, character.stateName), new Vector2(character.CharacterPosition[0], character.CharacterPosition[1]));
 			}
 		}
 	}
 
 	public List<CharacterSaveData> GetCharacters() {
 		List<CharacterSaveData> saveDatas = new List<CharacterSaveData>();
-		List<Character> characters = FindObjectOfType<CharacterInfo>().Characters.ToList();
+		List<Character> characters = FindObjectOfType<DialogueManager>().scripts.sentenceManager.Characters;
 
 		foreach (Character character in characters) {
-			saveDatas.Add(new CharacterSaveData() { CharacterName = character.CharacterName, CharacterOnScene = character.CharacterOnScene, CharacterPosition = new float[2] { character.CharacterPosition.x / character.CharacterScale.x, character.CharacterPosition.y / character.CharacterScale.y }, stateName = character.CurrentState.StateName });
+			saveDatas.Add(new CharacterSaveData() { 
+				CharacterName = character.CharacterName, 
+				CharacterOnScene = character.CharacterOnScene, 
+				CharacterPosition = new float[2] { 
+					character.CharacterPosition.x, 
+					character.CharacterPosition.y 
+				}, 
+				stateName = character.CurrentState.StateName 
+			});
 		}
 
 		return saveDatas;
@@ -238,8 +246,9 @@ public class BacklogEntry {
 
 [Serializable]
 public class CharacterSaveData {
-	public string CharacterName;
+	public int CharacterName;
 	public bool CharacterOnScene = false;
 	public float[] CharacterPosition = new float[2];
-	public string stateName;
+	public int variantName;
+	public int stateName;
 }

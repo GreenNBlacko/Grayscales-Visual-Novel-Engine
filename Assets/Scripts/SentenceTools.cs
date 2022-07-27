@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Localisation.Languages;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -7,121 +8,36 @@ using UnityEngine.Networking;
 
 public static class SentenceTools {
 	public static SentenceManager sentenceManager = ScriptableObject.CreateInstance<SentenceManager>();
-	public static CharacterInfo characterInfo;
 
 	public static void AddChapter(string ChapterName, int NextChapter = -1) {
-		sentenceManager = AssetDatabase.LoadAssetAtPath<SentenceManager>("Assets/Sentences/Sentence Manager.asset");
-		if (sentenceManager.Chapters.Length > 0) {
-			foreach (Chapter chap in sentenceManager.Chapters) {
-				if (chap.ChapterName == ChapterName) {
-					EditChapter(ChapterName, ChapterName, NextChapter);
-					return;
-				}
-			}
-		}
+		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
 
-		int i = sentenceManager.Chapters.Length;
+		Chapter chapter = new Chapter();
 
-		Array.Resize(ref sentenceManager.Chapters, i + 1);
-		sentenceManager.Chapters[i] = new Chapter();
-		sentenceManager.Chapters[i].ChapterName = ChapterName;
-		sentenceManager.Chapters[i].NextChapter = NextChapter;
-		sentenceManager.Chapters[i].Sentences = new List<Sentence>();
-		sentenceManager.Chapters[i].Sentences.Add(new Sentence());
+		chapter.Sentences = new List<Sentence>();
+		chapter.Sentences.Add(new Sentence());
+
+		sentenceManager.Chapters.Add(chapter);
 	}
 
-	public static void EditChapter(string ChapterName, string ChapterNameNew = "", int NextChapter = -1) {
-		int ChapterIndex = 0;
-		foreach (Chapter chap in sentenceManager.Chapters) {
-			if (chap.ChapterName == ChapterName) {
-				ChapterIndex = Array.IndexOf(sentenceManager.Chapters, chap);
-			}
-		}
-		if (ChapterNameNew != "") {
-			sentenceManager.Chapters[ChapterIndex].ChapterName = ChapterNameNew;
-		}
-		sentenceManager.Chapters[ChapterIndex].NextChapter = NextChapter;
-	}
+	public static void AddSentence(int ChapterName, int Name, bool OverrideName, string displayName, string Sentence, bool Choice = false, bool Voiced = false, string VoiceClip = "") {
 
-	public static void AddSentence(string ChapterName, string Name, string Sentence, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
-		AddSentence(ChapterName, Name, false, "", Sentence, Choice, choiceOptions, Voiced, VoiceClip);
-	}
+		int senIndex = sentenceManager.Chapters[ChapterName].Sentences.Count;
 
-	public static void AddSentence(string ChapterName, string Name, bool OverrideName, string displayName, string Sentence, bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
-		int ChapterIndex = -1;
-		foreach (Chapter chap in sentenceManager.Chapters) {
-			if (chap.ChapterName == ChapterName) {
-				ChapterIndex = Array.IndexOf(sentenceManager.Chapters, chap);
-			}
-		}
-		if (ChapterIndex == -1) {
-			Debug.LogError("Chapter '" + ChapterName + "' doesn't exist");
-			return;
-		}
-		if (sentenceManager.OverrideSentenceValues) {
-			foreach (Sentence sent in sentenceManager.Chapters[ChapterIndex].Sentences) {
-				if (sent.Name == Name && sent.Text == Sentence) {
-					EditSentence(ChapterName, Name, Sentence, Name, Sentence, Choice, choiceOptions);
-					return;
-				}
-			}
-		}
+		sentenceManager.Chapters[ChapterName].Sentences.Add(new Sentence());
 
-		int senIndex = sentenceManager.Chapters[ChapterIndex].Sentences.Count;
-
-		sentenceManager.Chapters[ChapterIndex].Sentences.Add(new Sentence());
-
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Name = Name;
+		sentenceManager.Chapters[ChapterName].Sentences[senIndex].Name = Name;
 		if (OverrideName) {
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].OverrideName = OverrideName;
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].DisplayName = displayName;
+			sentenceManager.Chapters[ChapterName].Sentences[senIndex].OverrideName = OverrideName;
+			GetSelectedLanguagePack().chapters[ChapterName].sentences[senIndex].DisplayName = displayName;
 		}
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Text = Sentence;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Choice = Choice;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].choiceOptions = choiceOptions;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Viewed = false;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Voiced = Voiced;
+
+		GetSelectedLanguagePack().chapters[ChapterName].sentences[senIndex].Text = Sentence;
+		sentenceManager.Chapters[ChapterName].Sentences[senIndex].Choice = Choice;
+		sentenceManager.Chapters[ChapterName].Sentences[senIndex].Voiced = Voiced;
+
 		if (Voiced) {
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].VoiceClip = AssetDatabase.LoadAssetAtPath<AudioClip>(VoiceClip);
-		}
-	}
-
-	public static void EditSentence(string ChapterName, string SentenceName, string SentenceText, string Name = "", string Text = "", bool Choice = false, Option[] choiceOptions = null, bool Voiced = false, string VoiceClip = "") {
-		int ChapterIndex = -1;
-		foreach (Chapter chap in sentenceManager.Chapters) {
-			if (chap.ChapterName == ChapterName) {
-				ChapterIndex = Array.IndexOf(sentenceManager.Chapters, chap);
-			}
-		}
-		if (ChapterIndex == -1) {
-			Debug.LogError("Chapter '" + ChapterName + "' doesn't exist");
-			return;
-		}
-		int senIndex = -1;
-		foreach (Sentence sent in sentenceManager.Chapters[ChapterIndex].Sentences) {
-			if (sent.Name == SentenceName && sent.Text == SentenceText) {
-				senIndex = sentenceManager.Chapters[ChapterIndex].Sentences.IndexOf(sent);
-			}
-		}
-		if (senIndex == -1) {
-			Debug.LogError("Sentence '" + SentenceText + "' doesn't exist");
-			return;
-		}
-		if (Name != "")
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Name = Name;
-		if (Text != "")
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Text = Text;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Choice = Choice;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].choiceOptions = choiceOptions;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Viewed = false;
-		sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].Voiced = Voiced;
-		if (Voiced) {
-			UriBuilder uri = new UriBuilder(Application.dataPath + "/Audio/" + VoiceClip);
-			uri.Scheme = "file";
-
-			UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri.ToString(), AudioType.OGGVORBIS);
-
-			sentenceManager.Chapters[ChapterIndex].Sentences[senIndex].VoiceClip = DownloadHandlerAudioClip.GetContent(www);
+			sentenceManager.Chapters[ChapterName].Sentences[senIndex].VoiceClip = AssetDatabase.LoadAssetAtPath<AudioClip>(VoiceClip);
 		}
 	}
 
@@ -134,13 +50,31 @@ public static class SentenceTools {
 			hex = hex.Replace("0x", "");
 		if (hex.Contains("#"))
 			hex = hex.Replace("#", "");
+
 		byte a = 255;
 		byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
 		byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
 		byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+
 		if (hex.Length == 8) {
 			a = byte.Parse(hex.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
 		}
+		return new Color32(r, g, b, a);
+	}
+
+	public static Color32 SetColorAlpha(Color32 color, byte alpha) {
+		return SetColorAlpha(color.r, color.g, color.b, alpha);
+	}
+
+	public static Color32 SetColorAlpha(Color color, byte alpha) {
+		byte r = (byte)(color.r * 255);
+		byte g = (byte)(color.g * 255);
+		byte b = (byte)(color.b * 255);
+
+		return SetColorAlpha(r, g, b, alpha);
+	}
+
+	public static Color32 SetColorAlpha(byte r, byte g, byte b, byte a) {
 		return new Color32(r, g, b, a);
 	}
 
@@ -160,15 +94,17 @@ public static class SentenceTools {
 		if (colorGradient.a < 255)
 			colorGradient = new Color32(255, 255, 255, 255);
 
-		int index = characterInfo.Characters.Length;
-		Array.Resize(ref characterInfo.Characters, index + 1);
-		characterInfo.Characters[index] = new Character();
-		characterInfo.Characters[index].CharacterName = characterName;
-		characterInfo.Characters[index].NameColor = nameColor;
-		characterInfo.Characters[index].TextColor = textColor;
-		characterInfo.Characters[index].gradientType = gradientType;
-		characterInfo.Characters[index].NameGradientColor = nameColorGradient;
-		characterInfo.Characters[index].TextGradientColor = textColorGradient;
+		Character character = new Character();
+
+		character.CharacterName = characterName;
+		character.NameColor = nameColor;
+		character.TextColor = textColor;
+		character.gradientType = gradientType;
+		character.NameGradientColor = nameColorGradient;
+		character.TextGradientColor = textColorGradient;
+		character.GradientColor = colorGradient;
+
+		sentenceManager.Characters.Add(character);
 	}
 
 	public static void AddCharacterState(string characterName, string characterVariant, string stateName, CharacterState.StateType stateType = CharacterState.StateType.SingleLayer, string BaseImagePath = "") {
@@ -176,28 +112,26 @@ public static class SentenceTools {
 	}
 
 	public static void AddCharacterState(string characterName, string characterVariant, string stateName, CharacterState.StateType stateType, string BaseImagePath, string stateImagePath, bool advanced, Vector2 offset) {
-		foreach (Character character in characterInfo.Characters) {
+		foreach (Character character in sentenceManager.Characters) {
 			if (character.CharacterName == characterName) {
 				foreach (CharacterVariant variant in character.characterVariants) {
-					int index = variant.variantStates.Length;
-					Array.Resize(ref variant.variantStates, index + 1);
 
 					Sprite baseImage = GetStateSprite(characterName, BaseImagePath), expressionImage = default;
 
 					if (stateImagePath != "") { expressionImage = GetStateSprite(characterName, stateImagePath); }
 
-					variant.variantStates[index] = new CharacterState(stateName, stateType, baseImage, expressionImage, advanced, offset);
+					variant.variantStates.Add(new CharacterState(stateName, stateType, baseImage, expressionImage, advanced, offset));
 				}
 			}
 		}
 	}
 
 	public static string[] GetChapterNames() {
-		sentenceManager = AssetDatabase.LoadAssetAtPath<SentenceManager>("Assets/Sentences/Sentence Manager.asset");
+		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
 
 		List<string> list = new List<string> { "None" };
 
-		foreach (Chapter chapter in sentenceManager.Chapters) {
+		foreach (var chapter in GetSelectedLanguagePack().chapters) {
 			list.Add(chapter.ChapterName);
 		}
 
@@ -205,9 +139,10 @@ public static class SentenceTools {
 	}
 
 	public static string[] GetCharacterNames() {
-		CharacterInfo characterInfo = GameObject.Find("ScriptManager").GetComponent<CharacterInfo>();
+		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
+
 		string[] list = new string[0];
-		foreach (Character character in characterInfo.Characters) {
+		foreach (var character in GetSelectedLanguagePack().characters) {
 			Array.Resize(ref list, list.Length + 1);
 			list[list.Length - 1] = character.CharacterName;
 		}
@@ -233,9 +168,10 @@ public static class SentenceTools {
 	}
 
 	public static string[] GetCharacterVariants(string CharacterName) {
-		CharacterInfo characterInfo = GameObject.Find("ScriptManager").GetComponent<CharacterInfo>();
+		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
+
 		List<string> list = new List<string>();
-		foreach (Character character in characterInfo.Characters) {
+		foreach (Character character in sentenceManager.Characters) {
 			if (character.CharacterName == CharacterName) {
 				foreach (CharacterVariant variant in character.characterVariants) {
 					list.Add(variant.VariantName);
@@ -246,9 +182,10 @@ public static class SentenceTools {
 	}
 
 	public static string[] GetCharacterStates(string CharacterName, string variantName) {
-		CharacterInfo characterInfo = GameObject.Find("ScriptManager").GetComponent<CharacterInfo>();
+		sentenceManager = GameObject.Find("ScriptManager").GetComponent<DialogueManager>().scripts.sentenceManager;
+
 		List<string> list = new List<string>();
-		foreach (Character character in characterInfo.Characters) {
+		foreach (Character character in sentenceManager.Characters) {
 			if (character.CharacterName == CharacterName) {
 				foreach (CharacterVariant variant in character.characterVariants) {
 					if (variant.VariantName == variantName) {
@@ -279,6 +216,10 @@ public static class SentenceTools {
 		}
 
 		return sprite;
+	}
+
+	public static LanguagePack GetSelectedLanguagePack() {
+		return sentenceManager.LanguagePacks[sentenceManager.SelectedLanguagePack];
 	}
 
 	public static bool PathExists(string path) {

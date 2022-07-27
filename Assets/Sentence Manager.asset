@@ -1,0 +1,194 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd500c14d21871345807d630de2ca8a2, type: 3}
+  m_Name: Sentence Manager
+  m_EditorClassIdentifier: 
+  UseJSONFile: 0
+  Translating: 0
+  OverrideSentenceValues: 0
+  Chapters:
+  - ChapterName: a
+    NextChapter: 0
+    Sentences:
+    - ChoiceActive: 0
+      onSentenceInitActive: 0
+      Name: Tohru
+      OverrideName: 0
+      DisplayName: 
+      Text: Testing the new charater manager
+      transition: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 1
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 8
+        CharacterName: Tohru
+        CharacterVariant: 
+        CharacterState: 
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 25
+        CG: 0
+        CharacterIndex: 0
+        RunOnlyOnce: 1
+        EnterScene: 0
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 0, y: 0}
+      - actionType: 3
+        CharacterName: Tohru
+        CharacterVariant: 
+        CharacterState: 
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 25
+        CG: 0
+        CharacterIndex: 0
+        RunOnlyOnce: 0
+        EnterScene: 0
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 0, y: 0}
+      - actionType: 3
+        CharacterName: Tohru
+        CharacterVariant: 
+        CharacterState: 
+        Delay: 0
+        FadeIn: 0
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 36
+        CG: 0
+        CharacterIndex: 0
+        RunOnlyOnce: 0
+        EnterScene: 0
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.7
+        Position: {x: 0, y: 0}
+    - ChoiceActive: 0
+      onSentenceInitActive: 0
+      Name: Saki
+      OverrideName: 0
+      DisplayName: 
+      Text: Now read Lord of the Mysteries
+      transition: 0
+      Choice: 0
+      choiceOptions: []
+      Viewed: 1
+      Voiced: 0
+      VoiceClip: {fileID: 0}
+      onSentenceInit:
+      - actionType: 8
+        CharacterName: Saki
+        CharacterVariant: Winter outfit
+        CharacterState: up-sa_c214
+        Delay: 0
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 0
+        FadeSpeed: 2
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 25
+        CG: 0
+        CharacterIndex: 4
+        RunOnlyOnce: 0
+        EnterScene: 1
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.6
+        Position: {x: 500, y: 0}
+      - actionType: 0
+        CharacterName: Saki
+        CharacterVariant: Winter outfit
+        CharacterState: up-sa_c214
+        Delay: 0
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 0
+        FadeSpeed: 0.4
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 0
+        CG: 0
+        CharacterIndex: 4
+        RunOnlyOnce: 0
+        EnterScene: 1
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.6
+        Position: {x: 500, y: 0}
+      - actionType: 7
+        CharacterName: Saki
+        CharacterVariant: Winter outfit
+        CharacterState: up-sa_c214
+        Delay: 1
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 0
+        FadeSpeed: 0.4
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 0
+        CG: 0
+        CharacterIndex: 4
+        RunOnlyOnce: 0
+        EnterScene: 1
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.6
+        Position: {x: 500, y: 0}
+      - actionType: 6
+        CharacterName: Saki
+        CharacterVariant: Winter outfit
+        CharacterState: up-sa_c203
+        Delay: 0
+        FadeIn: 1
+        FadeOut: 0
+        Transition: 1
+        FadeSpeed: 0.4
+        advanced: 0
+        CharacterOffset: {x: 0, y: 0}
+        BG: 0
+        CG: 0
+        CharacterIndex: 4
+        RunOnlyOnce: 0
+        EnterScene: 1
+        ExitScene: 0
+        startingPosition: 0
+        customStartingPosition: {x: 0, y: 0}
+        transitionSpeed: 0.4
+        Position: {x: 500, y: 0}

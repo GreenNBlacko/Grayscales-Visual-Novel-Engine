@@ -1,0 +1,135 @@
+{
+    "name": "Controls",
+    "maps": [
+        {
+            "name": "Navigation",
+            "id": "19f9ba5e-083a-4316-8213-ebf020035ff9",
+            "actions": [
+                {
+                    "name": "Next sentence",
+                    "type": "Button",
+                    "id": "3223c8b7-f947-4584-8b58-eeb9502f6f06",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press"
+                },
+                {
+                    "name": "Open backlog",
+                    "type": "Button",
+                    "id": "9f13ed3a-436d-4a61-8d05-cedaf6745152",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press"
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "58ded322-eabb-4b44-9fe1-973dae0a2fad",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Next sentence",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e30e22ca-83a2-4e49-8bcc-ce0996a38049",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Next sentence",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "38ddd8f8-71c0-41a9-a2d1-59ac746a1796",
+                    "path": "1DAxis(whichSideWins=2)",
+                    "interactions": "Tap",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Next sentence",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "4930e59d-968a-433b-982e-291f983c8547",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "Clamp(min=-1)",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Next sentence",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "bf2b21f2-e894-4646-9508-06c6124f9e17",
+                    "path": "<XInputController>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "Next sentence",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "33eba699-7731-4b1f-95aa-a591dfddb753",
+                    "path": "1DAxis(whichSideWins=1)",
+                    "interactions": "Tap",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Open backlog",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "positive",
+                    "id": "383b4e91-1111-4eb8-85c2-ee5dab489a41",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Open backlog",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Keyboard & Mouse",
+            "bindingGroup": "Keyboard & Mouse",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Controller",
+            "bindingGroup": "Controller",
+            "devices": [
+                {
+                    "devicePath": "<XInputController>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

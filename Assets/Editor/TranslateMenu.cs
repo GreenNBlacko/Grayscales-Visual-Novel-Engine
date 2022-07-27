@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using RestSharp;
+﻿using RestSharp;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -333,7 +333,7 @@ public class TranslateMenu : EditorWindow {
 
 					GoogleTranslateAnswer answer = JsonUtility.FromJson<GoogleTranslateAnswer>(response.Content);
 
-					if (!response.IsSuccessful) { Debug.LogError(answer.message); return text; }
+					if (response.ResponseStatus != ResponseStatus.Completed) { Debug.LogError(answer.message); return text; }
 
 					return answer.data.translations[0].translatedText;
 				}
@@ -356,7 +356,7 @@ public class TranslateMenu : EditorWindow {
 
 					DeepTranslateAnswer answer = JsonUtility.FromJson<DeepTranslateAnswer>(response.Content);
 
-					if (!response.IsSuccessful) { Debug.LogError(answer.message); return text; }
+					if (response.ResponseStatus != ResponseStatus.Completed) { Debug.LogError(answer.message); return text; }
 
 					return UnityWebRequest.UnEscapeURL(answer.data.translations.translatedText);
 				}
