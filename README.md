@@ -1,34 +1,56 @@
 # Grayscale's Visual Novel Engine
 Welcome to the world of visual novel development!
 
-My visual novel engine aims for simplicity for the user while having complete control on how it works.
+This engine is based on unity and is made for ease-of-use and is highly focused on localisation.
 
-# Features
-- Absolutely *0* amount of coding knowledge required to create a fully functional visual novel!
-- Easy to use dynamic systems that adjust to the user to improve their experience using the engine.
-- Simple to edit code for adding in plugins into the engine for people who like to push their experience to the limits!
-- Active support for fixing issues that you might encounter in your visual novel creation journey
+## DISCLAIMER
+This project is still a Work-In-Progress(WIP), some features may not be implemented or function as intended
 
-# Installation
-- Download and install your preferred unity version(suggested version: 2020.1.2f1).
+## Features
+- Low to no code development cycle
+- A graphical script editor
+- Easily extendable libraries for advanced users
+- A drag-and-drop setup process with modules that inform you of missing dependencies
+
+## Installation
+- Download and install your preferred unity version(suggested version: 2022.3.43 for best support).
 - Download the latest release from the releases page.
 - Extract the .zip file in an empty folder, preferably named after your project(e.g: Falling leaves of October).
 
-# Usage
+## Usage
 - Add the project in unity using the **'Add'** button and navigating to your project files.
+
 ![image](https://user-images.githubusercontent.com/45263750/132753210-2fcea2a1-433f-4dc8-9882-e6b74ed23fd2.png)
+
 - Launch the project and start by creating a new scene.
-- Create a new empty game object and name it **'ScriptManager'**.
-- Put these scripts in it: **DialogueManager, CharacterManager, ChapterManager, SaveLoadSystem, CharacterManager, JSONSentenceImporter**(only add this one if you plan to import sentences using a JSON file).
-- Right click in the 'project' window.
-- Then, go to Create>Sentence Manager like shown in the image.
+- Create a new empty game object and name it `ScriptManager`.
+- Add a component named `MainManager` onto the project.
+
+![image](https://github.com/user-attachments/assets/0d3d4349-f44b-41f9-8817-9ce0fd85f47b)
+
+- Right click in the `project` window.
+- Then, go to `Create>Sentence Manager` like shown in the image.
+
 ![image](https://user-images.githubusercontent.com/45263750/132752576-bbe18e99-7a1c-4d61-b578-c1214cb63af8.png)
-- Name the file to your preference and don't forget to assign it to the **'DialogueManager'** script
-- Now, create a simple UI using the prefab given in the prefabs folder.
-- Assign all the variables you intend to use with your UI in the **'DialogueManager'** script.
-![image](https://user-images.githubusercontent.com/45263750/132753604-e4f976b2-580d-40b7-809e-ba1b92fa1a71.png)
-- Edit the choice and backlog prefabs to match your preference.
 
-That's it! You're ready to create your own visual novel! Good luck in your journey and if you have any problems figuring out the engine--
+- Name the file to your preference and don't forget to assign it to the `MainManager` script
 
-Head to the docs page for an explanation on how to use one or another feature
+![image](https://github.com/user-attachments/assets/3779e2d8-2501-4661-a5c7-34f29b44fdf9)
+
+- Now, create a canvas and name it `UI`, attach the `UIManager` component to it
+
+![image](https://github.com/user-attachments/assets/41cfbcb1-3e9f-456f-8358-c1991d8ecd56)
+
+- Then, create your textbox using UI elements, don't forget to add a `TextBox` component to the textbox and assign the `name`(optional) and sentence `text` objects
+
+![image](https://github.com/user-attachments/assets/d5b776d5-57c4-4846-b34f-1a614e29ac6d)
+
+![image](https://github.com/user-attachments/assets/4918ce1b-7381-4ed8-a8cf-9c8cc531df6d)
+
+- Open the custom editor util panel if it is not already open, this will allow you to modify the script
+
+![image](https://github.com/user-attachments/assets/67ec825c-5867-48c7-ae45-122b7a421a51)
+
+![image](https://github.com/user-attachments/assets/465bcfa0-6393-4693-a669-c8846d8841ed)
+
+This will give you the utmost basic setup to be able to develop your story, if you wish to add character sprites, add the `CharacterManager` script to the `ScriptManager`, `AudioManager` for audio and `CGManager` for backgrounds
